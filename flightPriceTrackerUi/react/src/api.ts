@@ -1,8 +1,19 @@
 import axios from 'axios';
 import type { AlertResult, FlightSearch, PriceSnapshot, SearchCreateInput } from '@/Interfaces';
-import { getApiBase } from '@/config';
+import { getApiBase, getCookie } from '@/config';
 
 const BASE = getApiBase();
+
+// The c3auth cookie is path-scoped to the UI app, so the browser won't
+// send it on cross-app requests to the API. Read it from document.cookie
+// and attach it as an Authorization header instead.
+axios.interceptors.request.use((config) => {
+  const token = getCookie('c3auth');
+  if (token) {
+    config.headers['Authorization'] = token;
+  }
+  return config;
+});
 
 export const api = {
   searches: {

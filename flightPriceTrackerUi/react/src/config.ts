@@ -1,7 +1,7 @@
 const BACKEND_APP = 'flightpricetrackerapi';
 const API_ENDPOINT = 'flights';
 
-function getCookie(name: string): string | undefined {
+export function getCookie(name: string): string | undefined {
   return document.cookie
     .split('; ')
     .find(c => c.startsWith(`${name}=`))
