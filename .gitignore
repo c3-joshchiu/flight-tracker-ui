@@ -1,16 +1,27 @@
+# Node
 node_modules/
 dist/
+
+# Environment
 .env
 .env.local
-.DS_Store
-*.log
 
 # C3 generated
-flightPriceTrackerUi/gen/
-flightPriceTrackerUi/.fingerprints.txt
-flightPriceTrackerUi/jsconfig.json
+**/gen/cache/**
+**/.fingerprints.txt
+**/jsconfig.json
+.vs-cache
+.c3nbrc.js
 
 # IDE
 .vscode/
 .idea/
 .cursor/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
