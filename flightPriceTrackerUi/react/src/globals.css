@@ -1,0 +1,175 @@
+@import 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap' layer(base);
+
+/* C3 Design System — foundation + semantic tokens for consistency with other C3 apps */
+@import './c3ui/c3FoundationTokens.css' layer(base);
+@import './c3ui/c3SemanticTokensLight.css' layer(base);
+@import './c3ui/c3SemanticTokensDark.css' layer(base);
+
+@import 'tailwindcss';
+
+/* C3 Tailwind bridge — maps C3 color tokens to Tailwind palette (bg-blue-500 uses C3 blue) */
+@import './tailwind/c3TailwindTheme.css';
+
+/*
+ * App-specific theme tokens.
+ *
+ * These use EXPLICIT hex values (not C3 variable chains) to guarantee they
+ * always resolve. The C3 layers above provide the standard Tailwind palette
+ * colors; these tokens power the app's semantic classes (bg-card, bg-accent, etc.).
+ */
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+  /* Core palette — explicit values, theme-reactive via --app-* variables below */
+  --color-background: var(--app-background);
+  --color-foreground: var(--app-foreground);
+  --color-card: var(--app-card);
+  --color-card-foreground: var(--app-card-foreground);
+  --color-muted: var(--app-muted);
+  --color-muted-foreground: var(--app-muted-foreground);
+  --color-accent: var(--app-accent);
+  --color-accent-foreground: var(--app-accent-foreground);
+  --color-accent-weak: var(--app-accent-weak);
+  --color-border: var(--app-border);
+  --color-border-weak: var(--app-border);
+  --color-overlay: rgba(0, 0, 0, 0.5);
+
+  /* Fixed colors (don't change with theme) */
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+  --color-success: #22c55e;
+  --color-success-foreground: #ffffff;
+  --color-danger: #ef4444;
+
+  /* Sidebar — theme-reactive */
+  --color-primary: var(--app-primary);
+  --color-secondary: var(--app-secondary);
+  --color-weak: var(--app-border);
+
+  /* Status cards */
+  --color-status-red-bg: var(--app-status-red-bg);
+  --color-status-red-border: var(--app-status-red-border);
+  --color-status-red-badge-bg: #dc2626;
+  --color-status-red-badge-text: #ffffff;
+  --color-status-red-stat-bg: var(--app-status-red-stat-bg);
+  --color-status-red-stat-border: var(--app-status-red-stat-border);
+  --color-status-green-bg: var(--app-status-green-bg);
+  --color-status-green-border: var(--app-status-green-border);
+  --color-status-green-badge-bg: #16a34a;
+  --color-status-green-badge-text: #ffffff;
+  --color-status-green-stat-bg: var(--app-status-green-stat-bg);
+  --color-status-green-stat-border: var(--app-status-green-stat-border);
+  --color-status-grey-bg: var(--app-status-grey-bg);
+  --color-status-grey-border: var(--app-status-grey-border);
+  --color-status-grey-badge-bg: var(--app-status-grey-badge-bg);
+  --color-status-grey-badge-text: #ffffff;
+  --color-status-grey-stat-bg: var(--app-status-grey-stat-bg);
+  --color-status-grey-stat-border: var(--app-status-grey-stat-border);
+  --color-toast-success-bg: var(--app-toast-success-bg);
+  --color-toast-success-border: var(--app-toast-success-border);
+  --color-toast-success-text: var(--app-toast-success-text);
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-border);
+  }
+
+  body {
+    color: var(--color-foreground);
+    background-color: var(--color-background);
+    transition: background-color 0.2s, color 0.2s;
+  }
+
+  /* ── Light theme (default) ── */
+  :root {
+    --app-background: #f8fafc;
+    --app-foreground: #0f172a;
+    --app-card: #ffffff;
+    --app-card-foreground: #0f172a;
+    --app-muted: #f1f5f9;
+    --app-muted-foreground: #64748b;
+    --app-accent: #3b82f6;
+    --app-accent-foreground: #ffffff;
+    --app-accent-weak: #eff6ff;
+    --app-border: #e2e8f0;
+
+    --chart-economy: #3b82f6;
+    --chart-business: #8b5cf6;
+
+    --app-status-red-bg: #fef2f2;
+    --app-status-red-border: #fecaca;
+    --app-status-red-stat-bg: #fff5f5;
+    --app-status-red-stat-border: #fed7d7;
+    --app-status-green-bg: #f0fdf4;
+    --app-status-green-border: #bbf7d0;
+    --app-status-green-stat-bg: #f0fff4;
+    --app-status-green-stat-border: #c6f6d5;
+    --app-status-grey-bg: #f8fafc;
+    --app-status-grey-border: #e2e8f0;
+    --app-status-grey-badge-bg: #64748b;
+    --app-status-grey-stat-bg: #f8fafc;
+    --app-status-grey-stat-border: #e2e8f0;
+    --app-toast-success-bg: #f0fdf4;
+    --app-toast-success-border: #86efac;
+    --app-toast-success-text: #166534;
+  }
+
+  /* ── Dark theme ── */
+  .dark {
+    --app-background: #0f172a;
+    --app-foreground: #f1f5f9;
+    --app-card: #1e293b;
+    --app-card-foreground: #f1f5f9;
+    --app-muted: #334155;
+    --app-muted-foreground: #94a3b8;
+    --app-accent: #60a5fa;
+    --app-accent-foreground: #0f172a;
+    --app-accent-weak: #1e3a5f;
+    --app-border: #334155;
+
+    --chart-economy: #60a5fa;
+    --chart-business: #a78bfa;
+
+    --app-status-red-bg: #2d1215;
+    --app-status-red-border: #7f1d1d;
+    --app-status-red-stat-bg: #2d1215;
+    --app-status-red-stat-border: #991b1b;
+    --app-status-green-bg: #052e16;
+    --app-status-green-border: #166534;
+    --app-status-green-stat-bg: #052e16;
+    --app-status-green-stat-border: #15803d;
+    --app-status-grey-bg: #1e293b;
+    --app-status-grey-border: #334155;
+    --app-status-grey-badge-bg: #94a3b8;
+    --app-status-grey-stat-bg: #1e293b;
+    --app-status-grey-stat-border: #334155;
+    --app-toast-success-bg: #052e16;
+    --app-toast-success-border: #166534;
+    --app-toast-success-text: #86efac;
+  }
+
+  .sidebar-logo {
+    filter: brightness(0);
+  }
+
+  .dark .sidebar-logo {
+    filter: none;
+  }
+
+  .skeleton {
+    background: linear-gradient(90deg, var(--color-muted) 25%, var(--color-border) 50%, var(--color-muted) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 0.375rem;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+}
