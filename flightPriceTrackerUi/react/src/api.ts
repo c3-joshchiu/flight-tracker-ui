@@ -1,18 +1,49 @@
 import axios from 'axios';
 import type { AlertResult, FlightSearch, PriceSnapshot, SearchCreateInput } from '@/Interfaces';
-import { getApiBase, getCookie } from '@/config';
+import { getApiBase, getAuthTokenUrl } from '@/config';
 
 const BASE = getApiBase();
 
-// The c3auth cookie is path-scoped to the UI app, so the browser won't
-// send it on cross-app requests to the API. Read it from document.cookie
-// and attach it as an Authorization header instead.
-axios.interceptors.request.use((config) => {
-  const token = getCookie('c3auth');
-  if (token) {
-    config.headers['Authorization'] = token;
-  }
+let bearerToken: string | null = null;
+let tokenPromise: Promise<string> | null = null;
+
+function fetchBearerToken(): Promise<string> {
+  if (bearerToken) return Promise.resolve(bearerToken);
+  if (tokenPromise) return tokenPromise;
+
+  tokenPromise = axios
+    .get(getAuthTokenUrl())
+    .then((r) => {
+      bearerToken = r.data.access_token;
+      tokenPromise = null;
+      return bearerToken!;
+    })
+    .catch((err) => {
+      tokenPromise = null;
+      throw err;
+    });
+
+  return tokenPromise;
+}
+
+axios.interceptors.request.use(async (config) => {
+  if (config.url?.includes('/auth/token')) return config;
+
+  const token = await fetchBearerToken();
+  config.headers['Authorization'] = `Bearer ${token}`;
   return config;
+});
+
+axios.interceptors.response.use(undefined, async (error) => {
+  const orig = error.config;
+  if (error.response?.status === 401 && !orig._retry) {
+    orig._retry = true;
+    bearerToken = null;
+    const token = await fetchBearerToken();
+    orig.headers['Authorization'] = `Bearer ${token}`;
+    return axios(orig);
+  }
+  return Promise.reject(error);
 });
 
 export const api = {

@@ -1,5 +1,6 @@
 const BACKEND_APP = 'flightpricetrackerapi';
 const API_ENDPOINT = 'flights';
+const AUTH_ENDPOINT = 'auth';
 
 export function getCookie(name: string): string | undefined {
   return document.cookie
@@ -8,17 +9,19 @@ export function getCookie(name: string): string | undefined {
     ?.split('=')[1];
 }
 
-/**
- * Resolves the backend API base URL at runtime.
- *
- * Strategy:
- *   1. Use c3AppUrlPrefix cookie if available — swap the app segment.
- *   2. Fall back to c3env cookie — build /<env>/<backendApp>/<endpoint>.
- *   3. Last resort: relative path (works when UI and API share a package).
- */
+function getAppBase(): string {
+  const prefix = getCookie('c3AppUrlPrefix');
+  if (prefix) return `/${prefix}`;
+
+  const env = getCookie('c3env');
+  const app = getCookie('c3app') ?? 'flightpricetrackerui';
+  if (env) return `/${env}/${app}`;
+
+  return '.';
+}
+
 export function getApiBase(): string {
   const prefix = getCookie('c3AppUrlPrefix');
-
   if (prefix) {
     const parts = prefix.split('/');
     parts[parts.length - 1] = BACKEND_APP;
@@ -26,9 +29,11 @@ export function getApiBase(): string {
   }
 
   const env = getCookie('c3env');
-  if (env) {
-    return `/${env}/${BACKEND_APP}/${API_ENDPOINT}`;
-  }
+  if (env) return `/${env}/${BACKEND_APP}/${API_ENDPOINT}`;
 
   return `./${API_ENDPOINT}`;
+}
+
+export function getAuthTokenUrl(): string {
+  return `${getAppBase()}/${AUTH_ENDPOINT}/token`;
 }
