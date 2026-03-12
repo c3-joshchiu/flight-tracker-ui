@@ -4,3 +4,13 @@ dist/
 .env.local
 .DS_Store
 *.log
+
+# C3 generated
+flightPriceTrackerUi/gen/
+flightPriceTrackerUi/.fingerprints.txt
+flightPriceTrackerUi/jsconfig.json
+
+# IDE
+.vscode/
+.idea/
+.cursor/
