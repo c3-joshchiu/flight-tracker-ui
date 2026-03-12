@@ -1,0 +1,3 @@
+Canonical: platform
+SourceSystemTest: platform
+NewSourceSystemTest: platform

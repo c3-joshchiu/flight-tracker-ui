@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "lib": [
+      "ES2015"
+    ],
+    "checkJs": false,
+    "strictNullChecks": true
+  },
+  "typeAcquisition": {
+    "include": [
+      "jasmine",
+      "lodash"
+    ]
+  },
+  "include": [
+    "./src/**/*.js",
+    "./test/**/*.js",
+    "./gen/**/*.d.ts",
+    "/Users/joshc/Projects/flightPriceTrackerProj/.vs-cache/platform/gen/**/*.d.ts",
+    "/Users/joshc/Projects/flightPriceTrackerProj/flightTrackerApi/flightPriceTrackerApi/gen/**/*.d.ts"
+  ]
+}

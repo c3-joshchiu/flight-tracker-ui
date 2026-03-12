@@ -30,9 +30,9 @@ backend URL at runtime using the `c3AppUrlPrefix` cookie:
 
 | AppUrl Mode | Cookie Value | Resolved API Base |
 |-------------|-------------|-------------------|
-| Cluster URL | `dev/flightpricetrackerui` | `/dev/flightpricetracker/flights` |
-| Env URL | `flightpricetrackerui` | `/flightpricetracker/flights` |
-| Vanity URL | `` (empty) | `/flightpricetracker/flights` |
+| Cluster URL | `dev/flightpricetrackerui` | `/dev/flightpricetrackerapi/flights` |
+| Env URL | `flightpricetrackerui` | `/flightpricetrackerapi/flights` |
+| Vanity URL | `` (empty) | `/flightpricetrackerapi/flights` |
 
 This is handled by `src/config.ts` — no code changes needed when deploying
 to different environments. Authentication is automatic via the shared `c3auth`
@@ -81,7 +81,7 @@ flightPriceTrackerUi/
 ### Prerequisites
 
 - Node.js 18+
-- Access to a C3 environment with the `flightPriceTracker` backend provisioned
+- Access to a C3 environment with the `flightPriceTrackerApi` backend provisioned
 
 ### Setup
 
@@ -161,7 +161,7 @@ The C3 package manifest declares a dependency on the backend:
 {
   "name": "flightPriceTrackerUi",
   "dependencies": {
-    "flightPriceTracker": "1.0.0"
+    "flightPriceTrackerApi": "1.0.0"
   }
 }
 ```

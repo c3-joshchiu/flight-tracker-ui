@@ -1,12 +1,12 @@
-const BACKEND_APP = 'flightpricetracker';
+const BACKEND_APP = 'flightpricetrackerapi';
 const API_ENDPOINT = 'flights';
 
 /**
  * Resolves the backend API base URL at runtime using the c3AppUrlPrefix cookie.
  * Handles all three C3 AppUrl modes:
- *   - Cluster URL: prefix = "dev/flightpricetrackerui" → /dev/flightpricetracker/flights
- *   - Env URL:     prefix = "flightpricetrackerui"     → /flightpricetracker/flights
- *   - Vanity URL:  prefix = ""                          → /flightpricetracker/flights
+ *   - Cluster URL: prefix = "dev/flightpricetrackerui" → /dev/flightpricetrackerapi/flights
+ *   - Env URL:     prefix = "flightpricetrackerui"     → /flightpricetrackerapi/flights
+ *   - Vanity URL:  prefix = ""                          → /flightpricetrackerapi/flights
  */
 export function getApiBase(): string {
   const prefix = document.cookie

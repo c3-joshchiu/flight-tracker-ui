@@ -7,7 +7,7 @@ price history charts, and price trend alerts. Communicates with the backend
 exclusively via REST (no C3 type imports, no `c3Action` RPC).
 
 Deployed as an independent C3 AI package (`flightPriceTrackerUi`) with a
-runtime dependency on the backend package (`flightPriceTracker`).
+runtime dependency on the backend package (`flightPriceTrackerApi`).
 
 ## Architecture
 
@@ -54,14 +54,14 @@ prefix for the current app. The resolver swaps the app name segment:
 ```
 c3AppUrlPrefix = "dev/flightpricetrackerui"
                         ↓ swap last segment
-resolved base  = "/dev/flightpricetracker/flights"
+resolved base  = "/dev/flightpricetrackerapi/flights"
 ```
 
 | AppUrl Mode | Cookie Value | Resolved API Base |
 |-------------|-------------|-------------------|
-| Cluster URL | `dev/flightpricetrackerui` | `/dev/flightpricetracker/flights` |
-| Env URL | `flightpricetrackerui` | `/flightpricetracker/flights` |
-| Vanity URL | `` (empty) | `/flightpricetracker/flights` |
+| Cluster URL | `dev/flightpricetrackerui` | `/dev/flightpricetrackerapi/flights` |
+| Env URL | `flightpricetrackerui` | `/flightpricetrackerapi/flights` |
+| Vanity URL | `` (empty) | `/flightpricetrackerapi/flights` |
 
 Authentication is automatic — the `c3auth` cookie is scoped to the domain
 and shared across all apps in the environment.
