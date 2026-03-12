@@ -42,7 +42,7 @@ cookie.
 
 ```
 flightPriceTrackerUi/
-├── flightPriceTrackerUi.c3pkg.json   # C3 package manifest (depends on backend)
+├── flightPriceTrackerUi.c3pkg.json   # C3 package manifest
 ├── react/
 │   ├── src/
 │   │   ├── config.ts                 # Cross-app URL resolver
@@ -81,7 +81,7 @@ flightPriceTrackerUi/
 ### Prerequisites
 
 - Node.js 18+
-- Access to a C3 environment with the `flightPriceTrackerApi` backend provisioned
+- Access to a C3 environment with the `flightPriceTrackerApi` backend provisioned (for API calls to succeed)
 
 ### Setup
 
@@ -153,22 +153,13 @@ Or use the helper script:
 bash flightPriceTrackerUi/react/scripts/generate-client.sh
 ```
 
-## Package Dependency
+## Package Independence
 
-The C3 package manifest declares a dependency on the backend:
-
-```json
-{
-  "name": "flightPriceTrackerUi",
-  "dependencies": {
-    "flightPriceTrackerApi": "1.0.0"
-  }
-}
-```
-
-This ensures the backend is provisioned before the UI is deployed. Both
-packages share the same C3 environment and domain, so the `c3auth` cookie
-works across both.
+The UI and API are fully decoupled C3 packages with no compile-time dependency.
+The UI contains no `.c3typ` files — it's purely static assets — so the
+`c3pkg.json` has empty `dependencies`. The two packages connect only at
+runtime via HTTP. Both packages share the same C3 environment and domain,
+so the `c3auth` cookie works across both.
 
 ## Tech Stack
 

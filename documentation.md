@@ -248,4 +248,4 @@ Edit src/ → npm run build → commit ui/content/ → push → sync to SNE
 | `base: './'` in `vite.config.mts` | Asset paths must be relative for C3 deployment |
 | `postBuild.js` copies `dist/` → `ui/content/` | C3 serves static files from `ui/content/` |
 | `ui/content/` committed to git | This is the deployment artifact (C3 convention) |
-| `c3pkg.json` with backend dependency | Ensures backend is provisioned before frontend |
+| `c3pkg.json` with empty dependencies | UI has no C3 types — decoupled from API at build time |

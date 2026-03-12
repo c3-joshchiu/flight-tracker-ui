@@ -1,8 +1,6 @@
 {
   "name": "flightPriceTrackerUi",
   "description": "Flight Price Tracker — React frontend",
-  "dependencies": {
-    "flightPriceTrackerApi": "1.0.0"
-  },
+  "dependencies": {},
   "version": "1.0.0"
 }
