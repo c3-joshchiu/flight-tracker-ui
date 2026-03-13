@@ -1,0 +1,25 @@
+/**
+ * Server-side BFF proxy for cross-app API calls.
+ *
+ * The React frontend calls this proxy (same app, same cookie scope),
+ * and the proxy forwards requests to flightpricetrackerapi with a
+ * server-side OAuth Bearer token.
+ *
+ * Initialization is automated via App#afterStart. On first provision,
+ * setup() registers the OAuth client and stores credentials + API base
+ * URL in C3 Config. On subsequent starts it no-ops (idempotent).
+ */
+@restful(endpoint='flights')
+type FlightApiProxy mixes Restful {
+  handle: function(httpPath: !string, req: !HttpRequest): HttpResponse js-server
+
+  /**
+   * One-time setup: registers an OAuthApplication, stores the
+   * clientId/clientSecret and the API app base URL in C3 Config.
+   * Idempotent — skips registration if credentials already exist.
+   *
+   * Called automatically by App#afterStart, or manually:
+   *   FlightApiProxy.setup("FlightApi.Client")
+   */
+  setup: function(roleName: !string): string js-server
+}
