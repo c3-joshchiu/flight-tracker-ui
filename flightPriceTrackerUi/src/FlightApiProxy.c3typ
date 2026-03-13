@@ -5,21 +5,20 @@
  * and the proxy forwards requests to flightpricetrackerapi with a
  * server-side OAuth Bearer token.
  *
- * Initialization is automated via App#afterStart. On first provision,
- * setup() registers the OAuth client and stores credentials + API base
- * URL in C3 Config. On subsequent starts it no-ops (idempotent).
+ * OAuth credentials are provisioned out-of-band (see secret-config.md)
+ * and stored in FlightApiProxyConfig. This type only consumes them at
+ * runtime — it never registers OAuth clients itself.
  */
 @restful(endpoint='flights')
 type FlightApiProxy mixes Restful {
   handle: function(httpPath: !string, req: !HttpRequest): HttpResponse js-server
 
   /**
-   * One-time setup: registers an OAuthApplication, stores the
-   * clientId/clientSecret and the API app base URL in C3 Config.
-   * Idempotent — skips registration if credentials already exist.
+   * Read-only diagnostic: checks whether OAuth credentials and API base
+   * URL are present in FlightApiProxyConfig. Returns a status report.
    *
-   * Called automatically by App#afterStart, or manually:
-   *   FlightApiProxy.setup("FlightApi.Client")
+   * Called by App#afterStart to log readiness, or manually:
+   *   FlightApiProxy.verify()
    */
-  setup: function(roleName: !string): string js-server
+  verify: function(): string js-server
 }

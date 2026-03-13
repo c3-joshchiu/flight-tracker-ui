@@ -1,0 +1,21 @@
+REACT_SRC="flightPriceTrackerUi/react/src"
+UI_CONTENT="flightPriceTrackerUi/ui/content"
+
+CHANGED=$(git diff --cached --name-only -- "$REACT_SRC")
+
+if [ -z "$CHANGED" ]; then
+  exit 0
+fi
+
+echo "[pre-commit] React source files changed — rebuilding UI..."
+cd flightPriceTrackerUi/react || exit 1
+npm run build
+
+if [ $? -ne 0 ]; then
+  echo "[pre-commit] Build failed. Commit aborted."
+  exit 1
+fi
+
+cd ../..
+git add "$UI_CONTENT"
+echo "[pre-commit] UI rebuilt and ui/content/ staged."

@@ -5,9 +5,21 @@ import PriceChart from '@/components/PriceChart/PriceChart';
 import SearchForm from '@/components/SearchForm/SearchForm';
 import SearchSelector from '@/components/SearchSelector/SearchSelector';
 import { ToastContainer, useToast } from '@/components/Toast/Toast';
-import { useErrorBoundary } from '@/components/ErrorBoundary/ErrorBoundary';
+import axios from 'axios';
 import { api } from '@/api';
 import type { AlertResult, FlightSearch, PriceSnapshot, SearchCreateInput } from '@/Interfaces';
+
+function extractMessage(err: unknown): string {
+  if (axios.isAxiosError(err)) {
+    const r = err.response;
+    const url = r?.config?.url ?? err.config?.url ?? '?';
+    const status = r?.status ?? 'no response';
+    const body = r?.data ? JSON.stringify(r.data) : '';
+    return `${err.message} | ${status} ${url} ${body}`;
+  }
+  if (err instanceof Error) return err.message;
+  return String(err);
+}
 
 export default function Dashboard() {
   const [searches, setSearches] = useState<FlightSearch[]>([]);
@@ -21,7 +33,6 @@ export default function Dashboard() {
   const [chartRefresh, setChartRefresh] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const { toasts, show: showToast } = useToast();
-  const { reportError } = useErrorBoundary();
 
   const selected = searches.find((s) => s.id === selectedId) || null;
 
@@ -33,25 +44,21 @@ export default function Dashboard() {
         setSelectedId(data[0].id);
       }
     } catch (err) {
-      reportError(err);
+      setError(extractMessage(err));
     }
-  }, [selectedId, reportError]);
+  }, [selectedId]);
 
-  const loadAlert = useCallback(
-    async (searchId: string) => {
-      setAlertLoading(true);
-      try {
-        const data: AlertResult = await api.alerts.get(searchId);
-        setAlert(data);
-      } catch (err) {
-        reportError(err);
-        setAlert(null);
-      } finally {
-        setAlertLoading(false);
-      }
-    },
-    [reportError]
-  );
+  const loadAlert = useCallback(async (searchId: string) => {
+    setAlertLoading(true);
+    try {
+      const data: AlertResult = await api.alerts.get(searchId);
+      setAlert(data);
+    } catch {
+      setAlert(null);
+    } finally {
+      setAlertLoading(false);
+    }
+  }, []);
 
   const loadLatestPrice = useCallback(
     async (searchId: string) => {
@@ -91,7 +98,7 @@ export default function Dashboard() {
       setSelectedId(newSearch.id);
       showToast(`Search created: ${newSearch.fromAirport} \u2192 ${newSearch.toAirport}`);
     } catch (err) {
-      reportError(err);
+      setError(extractMessage(err));
     } finally {
       setCreating(false);
     }
@@ -112,7 +119,7 @@ export default function Dashboard() {
         showToast('Still monitoring');
       }
     } catch (err) {
-      reportError(err);
+      setError(extractMessage(err));
     } finally {
       setActionLoading(false);
     }
@@ -130,7 +137,7 @@ export default function Dashboard() {
       setSearches((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
       showToast(newStatus === 'active' ? 'Search resumed' : 'Search paused');
     } catch (err) {
-      reportError(err);
+      setError(extractMessage(err));
     } finally {
       setActionLoading(false);
     }
@@ -146,7 +153,7 @@ export default function Dashboard() {
       setChartRefresh((n) => n + 1);
       showToast(`Fetched ${snapshots.length} price${snapshots.length !== 1 ? 's' : ''}`);
     } catch (err) {
-      reportError(err);
+      setError(extractMessage(err));
     } finally {
       setFetching(false);
     }
@@ -163,7 +170,7 @@ export default function Dashboard() {
       setSelectedId(remaining.length > 0 ? remaining[0].id : null);
       showToast(`Deleted ${route}`);
     } catch (err) {
-      reportError(err);
+      setError(extractMessage(err));
     } finally {
       setActionLoading(false);
     }

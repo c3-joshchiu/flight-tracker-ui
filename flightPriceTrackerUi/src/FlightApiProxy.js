@@ -11,171 +11,167 @@ function handle(httpPath, req) {
     if (subPath.indexOf('flights/') === 0) subPath = subPath.substring(8);
     return _proxy(subPath, req);
   } catch (e) {
-    return _error(req, 500, e.message || 'Internal server error');
+    return req.responseFromJson({ error: e.message || 'Internal server error', status: 500 });
   }
 }
 
-/**
- * Idempotent setup: registers an OAuthApplication and stores credentials
- * + API base URL in C3 Config. Skips if credentials already exist.
- */
-function setup(roleName) {
-  var cfg = FlightApiProxy.getConfig();
-  var existingId = cfg.configValue(CONFIG_CLIENT_ID);
-  if (existingId) {
-    return 'Already configured. clientId: ' + existingId;
-  }
-
+function verify() {
+  var report = [];
   try {
-    var oAuthApp = OAuthApplication.make({
-      name: 'flightpricetrackerui-oauth-client',
-      redirectUri: 'https://localhost/oauth/callback'
-    });
-    var creds = oAuthApp.register([roleName]);
+    var cfg = FlightApiProxyConfig.getConfig();
 
-    cfg.setConfigValue(CONFIG_CLIENT_ID, creds.clientId);
-    cfg.setConfigValue(CONFIG_CLIENT_SECRET, creds.clientSecret);
+    var clientId = cfg.configValue(CONFIG_CLIENT_ID);
+    report.push('oauthClientId: ' + (clientId ? clientId : 'MISSING'));
 
-    var apiBaseUrl = _deriveApiBaseUrl();
-    cfg.setConfigValue(CONFIG_API_BASE_URL, apiBaseUrl);
+    var hasSecret = false;
+    try {
+      hasSecret = !!cfg.secretValue(CONFIG_CLIENT_SECRET);
+    } catch (e) {
+      hasSecret = false;
+    }
+    report.push('oauthClientSecret: ' + (hasSecret ? 'SET' : 'MISSING'));
 
-    _cachedToken = null;
-    _tokenExpiry = 0;
+    var apiBaseUrl = cfg.configValue(CONFIG_API_BASE_URL);
+    report.push('apiBaseUrl: ' + (apiBaseUrl ? apiBaseUrl : 'MISSING'));
 
-    return 'OAuth client registered. clientId: ' + creds.clientId +
-           ', apiBaseUrl: ' + apiBaseUrl;
+    var allPresent = clientId && hasSecret && apiBaseUrl;
+    report.push('status: ' + (allPresent ? 'READY' : 'NOT CONFIGURED'));
+
+    if (!allPresent) {
+      report.push('action: See secret-config.md');
+    }
   } catch (e) {
-    var msg = 'setup() failed: ' + (e.message || e) +
-              '. Ensure the API app is provisioned first.';
-    Log.warn(msg);
-    return msg;
+    report.push('verify error: ' + (e.message || e));
   }
+  return report.join('\n');
 }
+
+// ── Proxy ──────────────────────────────────────────────────
 
 function _proxy(subPath, req) {
   var token = _getToken();
-  var targetUrl = _buildTargetUrl(subPath, req);
+  var targetUrl = _targetUrl(subPath, req);
 
+  // Verified API: HttpRequest.make({method, url}).withHeader().sendSync() → HttpResponse
   var outbound = HttpRequest.make({
     method: req.method,
-    url: targetUrl
-  }).withHeaders({
-    'Authorization': 'Bearer ' + token,
-    'Content-Type': 'application/json'
-  });
+    url:    targetUrl
+  }).withHeader('Authorization', 'Bearer ' + token)
+    .withHeader('Content-Type', 'application/json');
 
   if (req.method === 'POST' || req.method === 'PATCH' || req.method === 'PUT') {
     var body = req.readBodyString();
     if (body) {
-      outbound = outbound.withBodyString(body);
+      outbound = outbound.withBodyString(body, 'application/json');
     }
   }
 
   var apiResp;
   try {
-    apiResp = outbound.send();
+    // Verified API: sendSync() returns HttpResponse
+    apiResp = outbound.sendSync();
   } catch (e) {
-    return _error(req, 502, 'API unavailable: ' + (e.message || e));
+    return req.responseFromJson({ error: 'API unavailable: ' + (e.message || e), status: 502 });
   }
 
+  // Verified API: HttpResponse.string() returns body as string
   var respBody = apiResp.string();
   if (!respBody || respBody.length === 0) {
     return req.emptyResponse();
   }
 
-  var resp = req.responseFromText(respBody);
-  resp.statusCode = apiResp.statusCode;
-  resp.headers = { 'Content-Type': 'application/json' };
-  return resp;
+  // responseFromJson sets Content-Type: application/json so axios auto-parses.
+  // responseFromText would return plain text causing axios to leave r.data as a string.
+  try {
+    return req.responseFromJson(JSON.parse(respBody));
+  } catch (e) {
+    return req.responseFromText(respBody);
+  }
 }
+
+// ── Token ──────────────────────────────────────────────────
 
 function _getToken() {
   var now = new Date().getTime();
-
   if (_cachedToken && now < _tokenExpiry) {
     return _cachedToken;
   }
 
-  var cfg = FlightApiProxy.getConfig();
-  var clientId = cfg.configValue(CONFIG_CLIENT_ID);
-  var clientSecret = cfg.configValue(CONFIG_CLIENT_SECRET);
+  var cfg = FlightApiProxyConfig.getConfig();
+  var clientId     = cfg.configValue(CONFIG_CLIENT_ID);
+  var clientSecret = cfg.secretValue(CONFIG_CLIENT_SECRET);
+  var apiBaseUrl   = cfg.configValue(CONFIG_API_BASE_URL);
 
-  if (!clientId || !clientSecret) {
+  if (!clientId || !clientSecret || !apiBaseUrl) {
+    throw new Error('OAuth not configured. See secret-config.md.');
+  }
+
+  var formBody = 'grant_type=client_credentials'
+    + '&client_id=' + encodeURIComponent(clientId)
+    + '&client_secret=' + encodeURIComponent(clientSecret);
+
+  var tokenUrl = apiBaseUrl.replace(/\/flights\/?$/, '') + '/oauth/token';
+
+  // C3's /oauth/token requires HTTP Basic Auth (client_id:client_secret)
+  // in addition to the form body. Without it the request gets a 302 redirect.
+  var basicBytes = new java.lang.String(clientId + ':' + clientSecret).getBytes('UTF-8');
+  var basicCred  = java.util.Base64.getEncoder().encodeToString(basicBytes);
+
+  var tokenReq = HttpRequest.make({
+    method: 'POST',
+    url:    tokenUrl
+  }).withHeader('Authorization', 'Basic ' + basicCred)
+    .withBodyString(formBody, 'application/x-www-form-urlencoded');
+
+  var tokenResp;
+  try {
+    tokenResp = tokenReq.sendSync();
+  } catch (e) {
+    throw new Error('Token request failed: ' + (e.message || e) + ' url=' + tokenUrl);
+  }
+
+  // Verified API: HttpResponse.string()
+  var raw = tokenResp.string();
+  if (!raw) {
+    throw new Error('Token response empty. url=' + tokenUrl);
+  }
+
+  var parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (e) {
+    throw new Error('Token response not JSON. raw=' + raw);
+  }
+
+  if (!parsed.access_token) {
     throw new Error(
-      'OAuth not configured. Run FlightApiProxy.setup("FlightApi.Client") or re-provision.'
+      'No access_token. keys=' + Object.keys(parsed).join(',')
+      + ' raw=' + raw + ' url=' + tokenUrl
     );
   }
 
-  var params = UrlQuery.make().withStringParameters({
-    grant_type:    'client_credentials',
-    client_id:     clientId,
-    client_secret: clientSecret
-  });
-  var tokenReq = HttpRequest.make({ method: 'POST' }).withBodyString(params.encode());
-  var tokenResp = OAuth.token(tokenReq);
-  var parsed = JSON.parse(tokenResp.json());
-
   _cachedToken = parsed.access_token;
-  _tokenExpiry = now + (parsed.expires_in ? parsed.expires_in * 1000 : 3600000) - BUFFER_MS;
+  _tokenExpiry = now
+    + (parsed.expires_in ? parsed.expires_in * 1000 : 3600000)
+    - BUFFER_MS;
 
   return _cachedToken;
 }
 
-function _buildTargetUrl(subPath, req) {
-  var cfg = FlightApiProxy.getConfig();
-  var baseUrl = cfg.configValue(CONFIG_API_BASE_URL);
-  if (!baseUrl) {
-    throw new Error('apiBaseUrl not configured. Run FlightApiProxy.setup() first.');
-  }
+// ── Helpers ────────────────────────────────────────────────
 
-  var url = baseUrl;
-  if (subPath) {
-    url += '/' + subPath;
-  }
+function _targetUrl(subPath, req) {
+  var cfg = FlightApiProxyConfig.getConfig();
+  var base = cfg.configValue(CONFIG_API_BASE_URL);
+  if (!base) throw new Error('apiBaseUrl not configured.');
 
-  var queryParams = req.queryParams();
-  if (queryParams && queryParams.size() > 0) {
-    var parts = [];
-    var keys = queryParams.keySet().toArray();
-    for (var i = 0; i < keys.length; i++) {
-      var key = keys[i];
-      var values = queryParams.get(key);
-      if (values) {
-        var valArr = values.toArray();
-        for (var j = 0; j < valArr.length; j++) {
-          parts.push(encodeURIComponent(key) + '=' + encodeURIComponent(valArr[j]));
-        }
-      }
-    }
-    if (parts.length > 0) {
-      url += '?' + parts.join('&');
-    }
-  }
+  var url = base;
+  if (subPath) url += '/' + subPath;
+
+  // Forward query string from original request
+  var reqUrl = req.url || '';
+  var qIdx = reqUrl.indexOf('?');
+  if (qIdx !== -1) url += reqUrl.substring(qIdx);
 
   return url;
-}
-
-/**
- * Derives the API app's flights endpoint URL from the current app's URL,
- * swapping the app name segment.
- */
-function _deriveApiBaseUrl() {
-  var currentUrl = Url.current().toString();
-  var uiApp = 'flightpricetrackerui';
-  var apiApp = 'flightpricetrackerapi';
-  var idx = currentUrl.indexOf(uiApp);
-  if (idx === -1) {
-    throw new Error(
-      'Cannot derive API base URL: "' + uiApp + '" not found in ' + currentUrl
-    );
-  }
-  var base = currentUrl.substring(0, idx) + apiApp;
-  return base + '/flights';
-}
-
-function _error(req, status, message) {
-  var resp = req.responseFromText(JSON.stringify({ error: message, status: status }));
-  resp.statusCode = status;
-  resp.headers = { 'Content-Type': 'application/json' };
-  return resp;
 }

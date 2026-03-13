@@ -1,0 +1,13 @@
+/**
+ * Configuration for the FlightApiProxy BFF proxy.
+ * Stores OAuth credentials and API base URL.
+ *
+ * Secrets (clientId, clientSecret) should be set via setSecretValue().
+ * The apiBaseUrl is a regular config value.
+ */
+type FlightApiProxyConfig mixes Config, Singleton {
+  oauthClientId:     string
+  @config(secret=true)
+  oauthClientSecret: string
+  apiBaseUrl:        string
+}

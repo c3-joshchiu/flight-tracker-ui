@@ -16,11 +16,12 @@ runtime dependency on the backend package (`flightPriceTrackerApi`).
 │  React Frontend (this repo)                              │
 │  Vite + Tailwind CSS v4                                  │
 │  SearchForm · PriceChart · AlertFlow · Toast             │
-│  HashRouter · api.ts REST client (axios)                 │
+│  HashRouter · api.ts REST client (axios, no auth code)   │
 ├──────────────────────────────────────────────────────────┤
-│  Cross-App HTTP Boundary                                 │
-│  config.ts resolves backend URL via c3AppUrlPrefix cookie │
-│  c3auth cookie shared across packages (same domain)      │
+│  BFF Proxy (FlightApiProxy, same C3 app)                 │
+│  config.ts resolves own app's /flights endpoint          │
+│  c3auth cookie authenticates browser→proxy hop           │
+│  Proxy adds OAuth Bearer token for proxy→API hop         │
 ├──────────────────────────────────────────────────────────┤
 │  flight-tracker-api (separate repo/package)              │
 │  FlightSearchApi @restful endpoint                       │
@@ -41,30 +42,29 @@ runtime dependency on the backend package (`flightPriceTrackerApi`).
 | Routing | HashRouter (required for C3 subpath serving) |
 | Deployment | `postBuild.js` → `ui/content/` (committed to git) |
 
-## Cross-App URL Resolution
+## URL Resolution (BFF Proxy)
 
-Since the UI and API are separate C3 packages, the frontend resolves the
-backend URL at runtime. This is handled by `src/config.ts`.
+The frontend calls its **own** app's `/flights` endpoint. The BFF proxy
+(`FlightApiProxy`) handles forwarding to the API app server-side.
 
-### How it works
-
-The C3 platform sets a `c3AppUrlPrefix` cookie that contains the URL path
-prefix for the current app. The resolver swaps the app name segment:
+`config.ts` resolves the URL by appending `/flights` to the current app's
+path prefix — no cross-app URL swap needed:
 
 ```
 c3AppUrlPrefix = "dev/flightpricetrackerui"
-                        ↓ swap last segment
-resolved base  = "/dev/flightpricetrackerapi/flights"
+                        ↓ append /flights
+resolved base  = "/dev/flightpricetrackerui/flights"
 ```
 
-| AppUrl Mode | Cookie Value | Resolved API Base |
-|-------------|-------------|-------------------|
-| Cluster URL | `dev/flightpricetrackerui` | `/dev/flightpricetrackerapi/flights` |
-| Env URL | `flightpricetrackerui` | `/flightpricetrackerapi/flights` |
-| Vanity URL | `` (empty) | `/flightpricetrackerapi/flights` |
+| Mode | Cookie Value | Resolved Base |
+|------|-------------|---------------|
+| Cluster URL | `dev/flightpricetrackerui` | `/dev/flightpricetrackerui/flights` |
+| Env URL | — (`c3env`=`dev`) | `/dev/flightpricetrackerui/flights` |
+| Fallback | — | `./flights` |
 
-Authentication is automatic — the `c3auth` cookie is scoped to the domain
-and shared across all apps in the environment.
+The `c3auth` cookie matches the path (same app), so the browser sends it
+automatically. The proxy adds an OAuth Bearer token for the hop to the API
+app. The frontend has no auth code.
 
 ## Type Generation Pipeline
 
@@ -248,4 +248,4 @@ Edit src/ → npm run build → commit ui/content/ → push → sync to SNE
 | `base: './'` in `vite.config.mts` | Asset paths must be relative for C3 deployment |
 | `postBuild.js` copies `dist/` → `ui/content/` | C3 serves static files from `ui/content/` |
 | `ui/content/` committed to git | This is the deployment artifact (C3 convention) |
-| `c3pkg.json` with empty dependencies | UI has no C3 types — decoupled from API at build time |
+| `c3pkg.json` with no API dependency | UI and API are decoupled — connected only at runtime via HTTP |

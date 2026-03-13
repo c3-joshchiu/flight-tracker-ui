@@ -2,9 +2,10 @@
 node_modules/
 dist/
 
-# Environment
+# Environment / Secrets
 .env
 .env.local
+.secrets
 
 # C3 generated
 **/gen/cache/**
