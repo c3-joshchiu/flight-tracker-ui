@@ -6,8 +6,7 @@ React dashboard for the Flight Price Tracker. Displays flight search criteria,
 price history charts, and price trend alerts. Communicates with the backend
 exclusively via REST (no C3 type imports, no `c3Action` RPC).
 
-Deployed as an independent C3 AI package (`flightPriceTrackerUi`) with a
-runtime dependency on the backend package (`flightPriceTrackerApi`).
+Deployed as an independent C3 AI package (`flightPriceTrackerUi`) that calls the backend package (`flightPriceTrackerApi`) via REST api calls.
 
 ## Architecture
 
@@ -31,16 +30,16 @@ runtime dependency on the backend package (`flightPriceTrackerApi`).
 
 ### Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | React 18, TypeScript |
-| Build | Vite, Tailwind CSS v4 |
-| HTTP client | Axios (typed via generated interfaces) |
-| Charts | Recharts (SVG line chart) |
-| UI components | KendoReact |
-| Type generation | openapi-typescript (from OpenAPI 3.1 spec) |
-| Routing | HashRouter (required for C3 subpath serving) |
-| Deployment | `postBuild.js` → `ui/content/` (committed to git) |
+| Layer           | Technology                                        |
+| --------------- | ------------------------------------------------- |
+| Framework       | React 18, TypeScript                              |
+| Build           | Vite, Tailwind CSS v4                             |
+| HTTP client     | Axios (typed via generated interfaces)            |
+| Charts          | Recharts (SVG line chart)                         |
+| UI components   | KendoReact                                        |
+| Type generation | openapi-typescript (from OpenAPI 3.1 spec)        |
+| Routing         | HashRouter (required for C3 subpath serving)      |
+| Deployment      | `postBuild.js` → `ui/content/` (committed to git) |
 
 ## URL Resolution (BFF Proxy)
 
@@ -56,11 +55,11 @@ c3AppUrlPrefix = "dev/flightpricetrackerui"
 resolved base  = "/dev/flightpricetrackerui/flights"
 ```
 
-| Mode | Cookie Value | Resolved Base |
-|------|-------------|---------------|
+| Mode        | Cookie Value               | Resolved Base                       |
+| ----------- | -------------------------- | ----------------------------------- |
 | Cluster URL | `dev/flightpricetrackerui` | `/dev/flightpricetrackerui/flights` |
-| Env URL | — (`c3env`=`dev`) | `/dev/flightpricetrackerui/flights` |
-| Fallback | — | `./flights` |
+| Env URL     | — (`c3env`=`dev`)          | `/dev/flightpricetrackerui/flights` |
+| Fallback    | —                          | `./flights`                         |
 
 The `c3auth` cookie matches the path (same app), so the browser sends it
 automatically. The proxy adds an OAuth Bearer token for the hop to the API
@@ -87,17 +86,17 @@ the boundary clear: API types come from the spec, display types are local.
 ### API Client Usage
 
 ```typescript
-import { api } from '@/api';
+import { api } from "@/api";
 
-api.searches.list()                                   // GET  /searches
-api.searches.create(data)                             // POST /searches
-api.searches.get(id)                                  // GET  /searches/:id
-api.searches.update(id, { searchStatus: 'active' })   // PATCH /searches/:id
-api.searches.delete(id)                               // DELETE /searches/:id
-api.alerts.get(searchId)                              // GET  /searches/:id/alert
-api.prices.history(searchId, 'economy')               // GET  /searches/:id/prices?seatClass=economy
-api.prices.latest(searchId)                           // GET  /searches/:id/latest-price
-api.prices.fetch(searchId)                            // POST /searches/:id/fetch
+api.searches.list(); // GET  /searches
+api.searches.create(data); // POST /searches
+api.searches.get(id); // GET  /searches/:id
+api.searches.update(id, { searchStatus: "active" }); // PATCH /searches/:id
+api.searches.delete(id); // DELETE /searches/:id
+api.alerts.get(searchId); // GET  /searches/:id/alert
+api.prices.history(searchId, "economy"); // GET  /searches/:id/prices?seatClass=economy
+api.prices.latest(searchId); // GET  /searches/:id/latest-price
+api.prices.fetch(searchId); // POST /searches/:id/fetch
 ```
 
 ## Page Layout
@@ -120,27 +119,33 @@ api.prices.fetch(searchId)                            // POST /searches/:id/fetc
 ## Components
 
 ### SideNav
+
 C3-style collapsible side navigation. Pinned to dark theme regardless of
 light/dark mode toggle.
 
 ### SearchForm
+
 Trip type selector, region-aware airport filters, date pickers, stops,
 passengers, currency. Submits to `api.searches.create()`.
 
 ### AirportCombobox
+
 Typeahead searching 622 airports by IATA code, city, state, and country.
 Ranked scoring algorithm. Region-aware filtering (10 regions). Full keyboard
 navigation support.
 
 ### PriceChart
+
 Pure SVG line chart showing economy (blue) and business (purple) price
 history. Built with Recharts.
 
 ### SearchSelector
+
 Full-width banner dropdown showing the active search route, trip type, and
 date. Includes search count.
 
 ### AlertFlow
+
 Three-card horizontal sequence:
 
 1. **Search Info** — route, dates, passengers
@@ -150,21 +155,23 @@ Three-card horizontal sequence:
 Includes a skeleton loader (`AlertFlowSkeleton`) for loading state.
 
 ### Toast
+
 Bottom-right notification system. Auto-dismisses after 3 seconds. Used for
 success/error feedback on API operations.
 
 ### ErrorBoundary
+
 React error boundary wrapper. Catches render errors and displays a fallback.
 
 ## Alert Display
 
 The alert card in AlertFlow is color-coded based on the API response:
 
-| Alert | Card Style | Badge Text |
-|-------|-----------|------------|
-| Grey | Slate-tinted | "Monitoring" |
-| Red | Red-tinted | "Price Rising" |
-| Green | Green-tinted | "Price Drop!" |
+| Alert | Card Style   | Badge Text     |
+| ----- | ------------ | -------------- |
+| Grey  | Slate-tinted | "Monitoring"   |
+| Red   | Red-tinted   | "Price Rising" |
+| Green | Green-tinted | "Price Drop!"  |
 
 Each alert also displays: weekly averages, percent change, cheapest airline,
 and a link to Google Flights.
@@ -174,15 +181,19 @@ and a link to Google Flights.
 CSS architecture uses three layers:
 
 ### 1. C3 Design System
+
 `c3FoundationTokens.css` + `c3SemanticTokensLight.css` / `c3SemanticTokensDark.css`
-+ `c3TailwindTheme.css` provide the standard C3 color palette so `bg-blue-500`,
-`text-gray-700` etc. match other C3 apps.
+
+- `c3TailwindTheme.css` provide the standard C3 color palette so `bg-blue-500`,
+  `text-gray-700` etc. match other C3 apps.
 
 ### 2. App Tokens
+
 `globals.css` defines ~30 semantic tokens (`--app-card`, `--app-accent`, etc.)
 with explicit hex values and light/dark variants via `:root` / `.dark` selectors.
 
 ### 3. Tailwind v4 @theme
+
 Bridges app tokens to Tailwind utility classes (`bg-card`, `text-muted-foreground`,
 etc.).
 
@@ -231,21 +242,21 @@ Edit src/ → npm run build → commit ui/content/ → push → sync to SNE
 
 ### What to Commit
 
-| Path | Commit? | Why |
-|------|---------|-----|
-| `react/src/` | Yes | Source code |
-| `react/src/api.generated.ts` | Yes | Generated types (reproducible, but committed for CI) |
-| `openapi/flights-api.yaml` | Yes | Local copy of API contract |
-| `ui/content/` | Yes | Built app — this IS the C3 deployment artifact |
-| `react/dist/` | No | Intermediate build output (gitignored) |
-| `react/node_modules/` | No | Dependencies (gitignored) |
+| Path                         | Commit? | Why                                                  |
+| ---------------------------- | ------- | ---------------------------------------------------- |
+| `react/src/`                 | Yes     | Source code                                          |
+| `react/src/api.generated.ts` | Yes     | Generated types (reproducible, but committed for CI) |
+| `openapi/flights-api.yaml`   | Yes     | Local copy of API contract                           |
+| `ui/content/`                | Yes     | Built app — this IS the C3 deployment artifact       |
+| `react/dist/`                | No      | Intermediate build output (gitignored)               |
+| `react/node_modules/`        | No      | Dependencies (gitignored)                            |
 
 ## C3 Platform Requirements
 
-| Requirement | Why |
-|-------------|-----|
-| `HashRouter` (not `BrowserRouter`) | App is served from a subpath on C3 |
-| `base: './'` in `vite.config.mts` | Asset paths must be relative for C3 deployment |
-| `postBuild.js` copies `dist/` → `ui/content/` | C3 serves static files from `ui/content/` |
-| `ui/content/` committed to git | This is the deployment artifact (C3 convention) |
-| `c3pkg.json` with no API dependency | UI and API are decoupled — connected only at runtime via HTTP |
+| Requirement                                   | Why                                                           |
+| --------------------------------------------- | ------------------------------------------------------------- |
+| `HashRouter` (not `BrowserRouter`)            | App is served from a subpath on C3                            |
+| `base: './'` in `vite.config.mts`             | Asset paths must be relative for C3 deployment                |
+| `postBuild.js` copies `dist/` → `ui/content/` | C3 serves static files from `ui/content/`                     |
+| `ui/content/` committed to git                | This is the deployment artifact (C3 convention)               |
+| `c3pkg.json` with no API dependency           | UI and API are decoupled — connected only at runtime via HTTP |
