@@ -24,3 +24,62 @@ export interface Airport {
   country: string;
   regions: string[];
 }
+
+// ── Export / Import types ────────────────────────────────────
+
+export interface ExportData {
+  exportedAt: string;
+  version: string;
+  searches: ExportedSearch[];
+  snapshots: ExportedSnapshot[];
+}
+
+export interface ExportedSearch {
+  id: string;
+  fromAirport: string;
+  toAirport: string;
+  tripType: string;
+  outboundDate: string;
+  returnDate: string | null;
+  maxStops: number | null;
+  passengersAdults: number;
+  currency: string;
+  searchStatus: string;
+  snapshotCount: number;
+}
+
+export interface ExportedSnapshot {
+  id: string;
+  flightSearchId: string;
+  seatClass: string;
+  price: number;
+  airlineCodes: string[];
+  airlineNames: string[];
+  flightType: string | null;
+  durationMinutes: number | null;
+  fetchedAt: string;
+}
+
+export interface ImportPayload {
+  searches?: ExportedSearch[];
+  snapshots?: ExportedSnapshot[];
+  conflictStrategy?: 'skip' | 'overwrite' | 'error';
+}
+
+export interface ImportReport {
+  status: string;
+  searches: ImportEntityReport;
+  snapshots: ImportEntityReport;
+}
+
+export interface ImportEntityReport {
+  created: number;
+  skipped: number;
+  overwritten: number;
+  errors: ImportError[];
+}
+
+export interface ImportError {
+  id: string;
+  error: string;
+}

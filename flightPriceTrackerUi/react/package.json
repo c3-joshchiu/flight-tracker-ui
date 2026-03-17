@@ -74,7 +74,8 @@
     "react-syntax-highlighter": "^15.6.3",
     "reactflow": "^11.8.3",
     "recharts": "^2.12.2",
-    "remark-gfm": "^3.0.1"
+    "remark-gfm": "^3.0.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.17",
