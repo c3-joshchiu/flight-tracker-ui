@@ -185,39 +185,29 @@ configured via the `prepare` script in `package.json`.
 
 ## Updating API Types
 
-When the backend API changes:
-
-1. Copy the updated spec from the API repo:
-
-```bash
-cp ../flightTrackerApi/openapi/flights-api.yaml openapi/
-```
-
-2. Regenerate TypeScript types:
-
-```bash
-cd flightPriceTrackerUi/react
-npm run generate:api
-```
-
-3. Fix any type errors:
-
-```bash
-npx tsc --noEmit
-```
-
-4. Build and commit:
-
-```bash
-npm run build
-git add -A && git commit -m "update types from API spec"
-```
-
-Or use the helper script:
+When the backend API changes, run the sync script from the UI repo root:
 
 ```bash
 bash flightPriceTrackerUi/react/scripts/generate-client.sh
 ```
+
+This single command:
+
+1. **Mirrors** `flights-api.yaml` from the API repo (if it detects changes)
+2. **Regenerates** `api.generated.ts` via `openapi-typescript`
+3. **Type-checks** with `tsc --noEmit` and fails early on breaking changes
+
+Then build and commit:
+
+```bash
+cd flightPriceTrackerUi/react
+npm run build
+git add -A && git commit -m "update types from API spec"
+```
+
+> **Manual alternative** — if the repos aren't siblings on disk, copy the spec
+> yourself (`cp /path/to/flightTrackerApi/openapi/flights-api.yaml openapi/`)
+> and run `npm run generate:api` from `flightPriceTrackerUi/react`.
 
 ## Package Independence
 
