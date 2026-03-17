@@ -32,8 +32,8 @@ export default function SearchForm({ onSubmit, loading }: Props) {
       toAirport: form.toAirport.toUpperCase(),
       tripType,
       outboundDate: form.outboundDate,
-      returnDate: tripType === 'round-trip' ? form.returnDate || null : null,
-      maxStops: form.maxStops ? parseInt(form.maxStops) : null,
+      returnDate: tripType === 'round-trip' ? form.returnDate || undefined : undefined,
+      maxStops: form.maxStops ? parseInt(form.maxStops) : undefined,
       passengersAdults: parseInt(form.passengersAdults) || 1,
       currency: form.currency,
     });

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import AlertFlow from '@/components/AlertFlow/AlertFlow';
 import AlertFlowSkeleton from '@/components/AlertFlow/AlertFlowSkeleton';
+import ExportImportDialog from '@/components/ExportImportDialog/ExportImportDialog';
 import PriceChart from '@/components/PriceChart/PriceChart';
 import SearchForm from '@/components/SearchForm/SearchForm';
 import SearchSelector from '@/components/SearchSelector/SearchSelector';
@@ -32,6 +33,7 @@ export default function Dashboard() {
   const [fetching, setFetching] = useState(false);
   const [chartRefresh, setChartRefresh] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [showExportImport, setShowExportImport] = useState(false);
   const { toasts, show: showToast } = useToast();
 
   const selected = searches.find((s) => s.id === selectedId) || null;
@@ -184,6 +186,12 @@ export default function Dashboard() {
             <h1 className="text-lg font-bold text-card-foreground">Flight Price Tracker</h1>
             <p className="text-xs text-muted-foreground">Monitor prices and get alerts on trends</p>
           </div>
+          <button
+            onClick={() => setShowExportImport(true)}
+            className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-card-foreground transition-colors hover:bg-muted"
+          >
+            Export / Import
+          </button>
         </div>
       </header>
 
@@ -245,6 +253,16 @@ export default function Dashboard() {
       </main>
 
       <ToastContainer toasts={toasts} />
+
+      <ExportImportDialog
+        open={showExportImport}
+        onClose={() => setShowExportImport(false)}
+        selectedSearchId={selectedId}
+        onImportComplete={() => {
+          loadSearches();
+          showToast('Import complete');
+        }}
+      />
     </div>
   );
 }
