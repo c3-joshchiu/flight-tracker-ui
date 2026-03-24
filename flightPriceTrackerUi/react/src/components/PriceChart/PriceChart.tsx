@@ -214,7 +214,7 @@ export default function PriceChart({ searchId, route, refreshKey }: Props) {
                     x2={PAD.left + PLOT_W}
                     y1={y}
                     y2={y}
-                    stroke="var(--color-border)"
+                    stroke="var(--c3-style-colorBorderWeak)"
                     strokeWidth={0.5}
                   />
                   <text
@@ -222,7 +222,7 @@ export default function PriceChart({ searchId, route, refreshKey }: Props) {
                     y={y + 3}
                     textAnchor="end"
                     fontSize={9}
-                    fill="var(--color-muted-foreground)"
+                    fill="var(--c3-style-colorFgSecondary)"
                   >
                     ${tick}
                   </text>
@@ -239,7 +239,7 @@ export default function PriceChart({ searchId, route, refreshKey }: Props) {
                   y={CHART_H - 4}
                   textAnchor="middle"
                   fontSize={8}
-                  fill="var(--color-muted-foreground)"
+                  fill="var(--c3-style-colorFgSecondary)"
                   transform={`rotate(-40, ${PAD.left + (i / Math.max(chartData.length - 1, 1)) * PLOT_W}, ${CHART_H - 4})`}
                 >
                   {pt.label}

@@ -206,7 +206,7 @@ export default function ExportImportDialog({ open, onClose, selectedSearchId, on
           </p>
 
           {exportError && (
-            <p className="mb-2 text-xs text-destructive">{exportError}</p>
+            <p className="mb-2 text-xs text-danger">{exportError}</p>
           )}
 
           <button
@@ -271,7 +271,7 @@ export default function ExportImportDialog({ open, onClose, selectedSearchId, on
           </div>
 
           {importError && (
-            <p className="mb-2 text-xs text-destructive">{importError}</p>
+            <p className="mb-2 text-xs text-danger">{importError}</p>
           )}
 
           <button
@@ -301,12 +301,12 @@ export default function ExportImportDialog({ open, onClose, selectedSearchId, on
               </div>
               {(importReport.searches.errors.length > 0 || importReport.snapshots.errors.length > 0) && (
                 <div className="mt-2 border-t border-weak pt-2">
-                  <p className="mb-1 font-medium text-destructive">Errors</p>
+                  <p className="mb-1 font-medium text-danger">Errors</p>
                   {importReport.searches.errors.map((e, i) => (
-                    <p key={`se-${i}`} className="text-destructive">Search {e.id}: {e.error}</p>
+                    <p key={`se-${i}`} className="text-danger">Search {e.id}: {e.error}</p>
                   ))}
                   {importReport.snapshots.errors.map((e, i) => (
-                    <p key={`sn-${i}`} className="text-destructive">Snapshot {e.id}: {e.error}</p>
+                    <p key={`sn-${i}`} className="text-danger">Snapshot {e.id}: {e.error}</p>
                   ))}
                 </div>
               )}

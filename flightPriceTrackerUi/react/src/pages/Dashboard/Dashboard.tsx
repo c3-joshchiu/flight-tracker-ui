@@ -195,7 +195,7 @@ export default function Dashboard() {
 
       <div className="p-4">
         {error && (
-          <div className="mb-4 border border-danger bg-danger-weak px-4 py-2.5 text-sm text-destructive">
+          <div className="mb-4 border border-danger bg-danger-weak px-4 py-2.5 text-sm text-danger">
             {error}
             <button onClick={() => setError(null)} className="ml-2 font-medium underline">
               Dismiss

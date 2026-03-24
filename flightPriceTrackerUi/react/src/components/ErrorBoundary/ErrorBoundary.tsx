@@ -22,9 +22,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex min-h-screen items-center justify-center bg-background p-8">
+        <div className="flex min-h-screen items-center justify-center p-8">
           <div className="c3-card max-w-md border border-danger">
-            <h2 className="mb-2 text-lg font-semibold text-destructive">Something went wrong</h2>
+            <h2 className="mb-2 text-lg font-semibold text-danger">Something went wrong</h2>
             <p className="text-sm text-secondary">
               {this.state.error?.message || 'An unexpected error occurred.'}
             </p>

@@ -62,8 +62,8 @@ export default function SearchForm({ onSubmit, loading }: Props) {
               onClick={() => setTripType(t)}
               className={`px-4 py-2 text-sm font-medium transition-colors ${
                 tripType === t
-                  ? 'bg-accent text-accent-foreground'
-                  : 'bg-muted text-secondary hover:bg-border'
+                  ? 'bg-accent text-inverse'
+                  : 'bg-secondary text-secondary hover:opacity-80'
               }`}
             >
               {t === 'one-way' ? 'One Way' : 'Round Trip'}
@@ -85,7 +85,7 @@ export default function SearchForm({ onSubmit, loading }: Props) {
                     e.target.checked ? [...prev, r.id] : prev.filter((f) => f !== r.id)
                   );
                 }}
-                className="size-3.5 rounded border-border accent-accent"
+                className="size-3.5 rounded border-weak accent-accent"
               />
               {r.label}
             </label>

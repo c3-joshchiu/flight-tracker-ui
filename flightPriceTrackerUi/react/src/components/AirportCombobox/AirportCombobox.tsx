@@ -160,7 +160,7 @@ export default function AirportCombobox({
         }}
         onFocus={() => setOpen(true)}
         onKeyDown={handleKeyDown}
-        className="w-full text-sm text-foreground uppercase placeholder:normal-case placeholder:text-secondary"
+        className="w-full text-sm text-primary uppercase placeholder:normal-case placeholder:text-secondary"
         autoComplete="off"
       />
       <input type="hidden" value={value} />
@@ -168,7 +168,7 @@ export default function AirportCombobox({
         <ul
           ref={listRef}
           role="listbox"
-          className="absolute z-50 mt-1 max-h-56 w-full overflow-auto border border-weak bg-card shadow-lg"
+          className="absolute z-50 mt-1 max-h-56 w-full overflow-auto border border-weak bg-primary shadow-lg"
         >
           {results.map((a, i) => (
             <li
@@ -178,7 +178,7 @@ export default function AirportCombobox({
               onMouseDown={() => select(a)}
               onMouseEnter={() => setHighlightIdx(i)}
               className={`flex cursor-pointer items-center gap-2 px-3 py-2 text-sm ${
-                i === highlightIdx ? 'bg-accent text-accent-foreground' : 'text-primary'
+                i === highlightIdx ? 'bg-accent text-inverse' : 'text-primary'
               }`}
             >
               <span className="w-10 shrink-0 font-mono font-semibold">{a.iata}</span>
@@ -188,7 +188,7 @@ export default function AirportCombobox({
         </ul>
       )}
       {open && query.trim() && results.length === 0 && (
-        <div className="absolute z-50 mt-1 w-full border border-weak bg-card px-3 py-2 text-sm text-secondary shadow-lg">
+        <div className="absolute z-50 mt-1 w-full border border-weak bg-primary px-3 py-2 text-sm text-secondary shadow-lg">
           No airports found
         </div>
       )}

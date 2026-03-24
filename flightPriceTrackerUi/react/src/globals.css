@@ -15,40 +15,17 @@
 /*
  * App-specific theme tokens.
  *
- * These use EXPLICIT hex values (not C3 variable chains) to guarantee they
- * always resolve. The C3 layers above provide the standard Tailwind palette
- * colors; these tokens power the app's semantic classes (bg-card, bg-accent, etc.).
+ * Only tokens with NO C3 equivalent remain here: status cards, chart
+ * colors, and toast colors. All core palette colors (bg, fg, card,
+ * accent, border, muted) are now driven by C3 semantic tokens via
+ * c3CustomUtilities.css.
  */
 @theme {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
-  /* Core palette — explicit values, theme-reactive via --app-* variables below */
-  --color-background: var(--app-background);
-  --color-foreground: var(--app-foreground);
-  --color-card: var(--app-card);
-  --color-card-foreground: var(--app-card-foreground);
-  --color-muted: var(--app-muted);
-  --color-muted-foreground: var(--app-muted-foreground);
-  --color-accent: var(--app-accent);
-  --color-accent-foreground: var(--app-accent-foreground);
-  --color-accent-weak: var(--app-accent-weak);
-  --color-border: var(--app-border);
-  --color-border-weak: var(--app-border);
   --color-overlay: rgba(0, 0, 0, 0.5);
 
-  /* Fixed colors (don't change with theme) */
-  --color-destructive: #ef4444;
-  --color-destructive-foreground: #ffffff;
-  --color-success: #22c55e;
-  --color-success-foreground: #ffffff;
-  --color-danger: #ef4444;
-
-  /* Sidebar — theme-reactive */
-  --color-primary: var(--app-primary);
-  --color-secondary: var(--app-secondary);
-  --color-weak: var(--app-border);
-
-  /* Status cards */
+  /* Status cards (app-specific — no C3 equivalent) */
   --color-status-red-bg: var(--app-status-red-bg);
   --color-status-red-border: var(--app-status-red-border);
   --color-status-red-badge-bg: #dc2626;
@@ -81,25 +58,8 @@
     border-color: var(--color-border-weak);
   }
 
-  body {
-    color: var(--color-foreground);
-    background-color: var(--color-background);
-    transition: background-color 0.2s, color 0.2s;
-    --kendo-font-family: 'Inter', system-ui, sans-serif !important;
-  }
-
-  /* ── Light theme (default) ── */
   :root {
-    --app-background: #f8fafc;
-    --app-foreground: #0f172a;
-    --app-card: #ffffff;
-    --app-card-foreground: #0f172a;
-    --app-muted: #f1f5f9;
-    --app-muted-foreground: #64748b;
-    --app-accent: #3b82f6;
-    --app-accent-foreground: #ffffff;
-    --app-accent-weak: #eff6ff;
-    --app-border: #e2e8f0;
+    color-scheme: light;
 
     --chart-economy: #3b82f6;
     --chart-business: #8b5cf6;
@@ -122,18 +82,8 @@
     --app-toast-success-text: #166534;
   }
 
-  /* ── Dark theme ── */
   .dark {
-    --app-background: #0f172a;
-    --app-foreground: #f1f5f9;
-    --app-card: #1e293b;
-    --app-card-foreground: #f1f5f9;
-    --app-muted: #334155;
-    --app-muted-foreground: #94a3b8;
-    --app-accent: #60a5fa;
-    --app-accent-foreground: #0f172a;
-    --app-accent-weak: #1e3a5f;
-    --app-border: #334155;
+    color-scheme: dark;
 
     --chart-economy: #60a5fa;
     --chart-business: #a78bfa;
@@ -156,16 +106,13 @@
     --app-toast-success-text: #86efac;
   }
 
-  .sidebar-logo {
-    filter: brightness(0);
-  }
-
-  .dark .sidebar-logo {
-    filter: none;
+  body {
+    transition: background-color 0.2s, color 0.2s;
+    --kendo-font-family: 'Inter', system-ui, sans-serif !important;
   }
 
   .skeleton {
-    background: linear-gradient(90deg, var(--color-muted) 25%, var(--color-border) 50%, var(--color-muted) 75%);
+    background: linear-gradient(90deg, var(--color-secondary-bg) 25%, var(--color-border-weak) 50%, var(--color-secondary-bg) 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
     border-radius: 0.375rem;

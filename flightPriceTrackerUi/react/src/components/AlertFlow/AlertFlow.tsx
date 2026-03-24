@@ -52,14 +52,14 @@ function Connector() {
   return (
     <>
       <div className="hidden shrink-0 items-center self-center px-3 sm:flex">
-        <div className="h-0.5 w-10 rounded-full bg-muted-foreground/40" />
-        <svg viewBox="0 0 14 20" className="h-5 w-3.5 text-muted-foreground/40" fill="currentColor">
+        <div className="h-0.5 w-10 rounded-full bg-gray-500/40" />
+        <svg viewBox="0 0 14 20" className="h-5 w-3.5 text-gray-500/40" fill="currentColor">
           <path d="M0 0 L14 10 L0 20 Z" />
         </svg>
       </div>
       <div className="flex flex-col items-center py-2 sm:hidden">
-        <div className="h-6 w-0.5 rounded-full bg-muted-foreground/40" />
-        <svg viewBox="0 0 20 14" className="h-3.5 w-5 text-muted-foreground/40" fill="currentColor">
+        <div className="h-6 w-0.5 rounded-full bg-gray-500/40" />
+        <svg viewBox="0 0 20 14" className="h-3.5 w-5 text-gray-500/40" fill="currentColor">
           <path d="M0 0 L20 0 L10 14 Z" />
         </svg>
       </div>
@@ -96,7 +96,7 @@ function ConfirmDeleteModal({
         aria-modal="true"
       >
         <div className="mb-1 flex items-center gap-2">
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-red-50 text-destructive">
+          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-danger-weak text-danger">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
               <path
                 fillRule="evenodd"
@@ -159,7 +159,7 @@ export default function AlertFlow({
           <div className="mb-1.5 flex items-center gap-2">
             <span
               className={`inline-block h-2 w-2 rounded-full ${
-                search.searchStatus === 'active' ? 'bg-accent' : 'bg-muted-foreground'
+                search.searchStatus === 'active' ? 'bg-accent' : 'bg-gray-500'
               }`}
             />
             <span className="text-[11px] font-semibold uppercase tracking-wider text-secondary">
