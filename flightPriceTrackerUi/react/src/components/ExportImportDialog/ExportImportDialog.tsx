@@ -87,6 +87,7 @@ export default function ExportImportDialog({ open, onClose, selectedSearchId, on
         }
       }
     } catch (err) {
+      console.error('[ExportImportDialog] export failed', { format, scope, selectedSearchId }, err);
       setExportError(err instanceof Error ? err.message : String(err));
     } finally {
       setExporting(false);
@@ -98,6 +99,7 @@ export default function ExportImportDialog({ open, onClose, selectedSearchId, on
     setImportFile(file);
     setImportReport(null);
     setImportError(null);
+    e.target.value = '';
   }, []);
 
   const handleImport = useCallback(async () => {
@@ -123,6 +125,7 @@ export default function ExportImportDialog({ open, onClose, selectedSearchId, on
       setImportReport(report);
       onImportComplete();
     } catch (err) {
+      console.error('[ExportImportDialog] import failed', { file: importFile?.name, conflictStrategy }, err);
       setImportError(err instanceof Error ? err.message : String(err));
     } finally {
       setImporting(false);
