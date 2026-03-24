@@ -14,8 +14,6 @@ import { faSun, faMoon } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '@/hooks/useTheme';
 import { navigationConfig } from '@/config/navigation';
 import { NavigationItem } from '@/types/navigation';
-import logoSvg from '@/assets/logo.svg';
-
 export default function SideNav() {
   const { currentTheme, toggleTheme } = useTheme();
   const location = useLocation();
@@ -45,7 +43,7 @@ export default function SideNav() {
       {/* Desktop SideNav */}
       <nav className="hidden sm:flex w-16 bg-primary border-r border-weak flex-col items-center z-20 flex-shrink-0">
         <div className="mt-3 mb-3">
-          <img src={logoSvg} alt="C3 AI" className="w-8 h-8 sidebar-logo" />
+          <div className="c3-logo"></div>
         </div>
         <ul className="flex flex-col gap-1 w-full flex-1">
           {navigationConfig.map((item) => (
@@ -116,7 +114,7 @@ export default function SideNav() {
         <nav className="sm:hidden fixed top-0 left-0 h-full w-80 bg-primary border-r border-weak z-50 overflow-y-auto">
           <div className="p-4">
             <div className="flex justify-between items-center mb-6">
-              <img src={logoSvg} alt="C3 AI" className="w-8 h-8 sidebar-logo" />
+              <div className="c3-logo"></div>
               <button
                 onClick={toggleMenu}
                 className="p-2 text-secondary hover:text-primary transition-colors"

@@ -9,6 +9,8 @@
 
 /* C3 Tailwind bridge — maps C3 color tokens to Tailwind palette (bg-blue-500 uses C3 blue) */
 @import './tailwind/c3TailwindTheme.css';
+@import './tailwind/c3CustomUtilities.css';
+@import './tailwind/vendorOverrides.css';
 
 /*
  * App-specific theme tokens.
@@ -76,13 +78,14 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-border);
+    border-color: var(--color-border-weak);
   }
 
   body {
     color: var(--color-foreground);
     background-color: var(--color-background);
     transition: background-color 0.2s, color 0.2s;
+    --kendo-font-family: 'Inter', system-ui, sans-serif !important;
   }
 
   /* ── Light theme (default) ── */

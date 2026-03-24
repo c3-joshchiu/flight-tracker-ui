@@ -91,7 +91,7 @@ function ConfirmDeleteModal({
         }}
       />
       <div
-        className="relative w-full max-w-sm rounded-xl border border-border bg-card p-6 shadow-xl"
+        className="c3-card relative w-full max-w-sm"
         role="dialog"
         aria-modal="true"
       >
@@ -105,22 +105,22 @@ function ConfirmDeleteModal({
               />
             </svg>
           </span>
-          <h3 className="text-base font-semibold text-card-foreground">Delete Search</h3>
+          <h3 className="text-base font-semibold text-primary">Delete Search</h3>
         </div>
-        <p className="mb-5 mt-2 text-sm text-muted-foreground">
+        <p className="mb-5 mt-2 text-sm text-secondary">
           Are you sure you want to delete <strong>{route}</strong>? All price history for this search
           will be permanently removed.
         </p>
         <div className="flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-card-foreground transition-colors hover:bg-muted"
+            className="flex-1 py-2 px-6 text-base border border-accent text-accent hover:bg-accent hover:text-inverse transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 rounded-lg bg-destructive px-4 py-2 text-sm font-semibold text-destructive-foreground transition-opacity hover:opacity-90"
+            className="flex-1 py-2 px-6 text-base bg-danger text-inverse hover:opacity-90 transition-opacity"
           >
             Delete
           </button>
@@ -155,33 +155,33 @@ export default function AlertFlow({
     <>
       <div className="flex flex-col sm:flex-row sm:items-stretch">
         {/* Node 1: Search Info */}
-        <div className="flex min-w-0 flex-1 flex-col rounded-xl border border-border bg-card p-4 shadow-sm">
+        <div className="c3-card flex-1 min-w-0 flex flex-col">
           <div className="mb-1.5 flex items-center gap-2">
             <span
               className={`inline-block h-2 w-2 rounded-full ${
                 search.searchStatus === 'active' ? 'bg-accent' : 'bg-muted-foreground'
               }`}
             />
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-secondary">
               {search.searchStatus === 'active' ? 'Search Active' : 'Paused'}
             </span>
           </div>
-          <p className="text-base font-semibold leading-tight text-card-foreground">
+          <p className="text-base font-semibold leading-tight text-primary">
             {search.fromAirport} &rarr; {search.toAirport}
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">
+          <p className="mt-1 text-xs text-secondary">
             {search.tripType === 'round-trip' ? 'Round trip' : 'One way'} &middot;{' '}
             {search.outboundDate ? search.outboundDate.substring(0, 10) : ''}
             {search.returnDate ? ` \u2014 ${search.returnDate.substring(0, 10)}` : ''}
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-secondary">
             {search.passengersAdults} pax &middot; {search.currency}
           </p>
           {latestPrice && (
-            <div className="mt-2 rounded-lg bg-muted px-2.5 py-1.5">
-              <p className="text-sm font-semibold text-card-foreground">
+            <div className="mt-2 bg-secondary px-2.5 py-1.5">
+              <p className="text-sm font-semibold text-primary">
                 {formatPrice(latestPrice.price)}
-                <span className="ml-1 text-[11px] font-normal text-muted-foreground">
+                <span className="ml-1 text-[11px] font-normal text-secondary">
                   {latestPrice.seatClass} &middot;{' '}
                   {new Date(latestPrice.fetchedAt).toLocaleDateString()}
                 </span>
@@ -192,7 +192,7 @@ export default function AlertFlow({
             <button
               onClick={onFetchNow}
               disabled={fetching}
-              className="w-full rounded-lg border border-accent/30 bg-blue-50 px-2 py-1.5 text-[11px] font-semibold text-accent transition-colors hover:bg-blue-100 disabled:opacity-50"
+              className="w-full py-1.5 px-4 text-sm border border-accent text-accent hover:bg-accent hover:text-inverse transition-colors disabled:opacity-50"
             >
               {fetching ? 'Fetching...' : 'Fetch Now'}
             </button>
@@ -203,7 +203,7 @@ export default function AlertFlow({
 
         {/* Node 2: Alert Status */}
         <div
-          className={`flex min-w-0 flex-1 flex-col rounded-xl border p-4 shadow-sm ${config.bg} ${config.border}`}
+          className={`flex min-w-0 flex-1 flex-col border p-4 ${config.bg} ${config.border}`}
         >
           <div className="mb-1.5 flex items-center gap-2">
             <span
@@ -215,23 +215,23 @@ export default function AlertFlow({
               {config.label}
             </span>
           </div>
-          <p className="text-sm leading-snug text-card-foreground">
+          <p className="text-sm leading-snug text-primary">
             {alert?.message || 'Loading...'}
           </p>
           {alert?.currentWeekAvg != null && alert?.previousWeekAvg != null && (
             <div className="mt-2 grid grid-cols-2 gap-1.5 text-xs">
-              <div className={`rounded-lg p-2 ${config.statBox}`}>
-                <p className="text-[11px] text-muted-foreground">This week</p>
+              <div className={`p-2 ${config.statBox}`}>
+                <p className="text-[11px] text-secondary">This week</p>
                 <p className="text-sm font-semibold">{formatPrice(alert.currentWeekAvg)}</p>
               </div>
-              <div className={`rounded-lg p-2 ${config.statBox}`}>
-                <p className="text-[11px] text-muted-foreground">Last week</p>
+              <div className={`p-2 ${config.statBox}`}>
+                <p className="text-[11px] text-secondary">Last week</p>
                 <p className="text-sm font-semibold">{formatPrice(alert.previousWeekAvg)}</p>
               </div>
             </div>
           )}
           {alert?.percentChange != null && (
-            <p className="mt-1.5 text-xs text-muted-foreground">
+            <p className="mt-1.5 text-xs text-secondary">
               {alert.percentChange > 0 ? '+' : ''}
               {alert.percentChange.toFixed(1)}% change
               {alert.cheapestAirline ? ` \u00B7 Cheapest: ${alert.cheapestAirline}` : ''}
@@ -242,8 +242,8 @@ export default function AlertFlow({
         <Connector />
 
         {/* Node 3: Actions */}
-        <div className="flex min-w-0 flex-1 flex-col rounded-xl border border-border bg-card p-4 shadow-sm">
-          <span className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <div className="c3-card flex-1 min-w-0 flex flex-col">
+          <span className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-secondary">
             Actions
           </span>
 
@@ -252,7 +252,7 @@ export default function AlertFlow({
               href={alert?.googleFlightsUrl || '#'}
               target="_blank"
               rel="noopener noreferrer"
-              className={`rounded-lg bg-success px-3 py-2 text-center text-xs font-semibold text-success-foreground transition-opacity hover:opacity-90 ${
+              className={`py-2 px-6 text-sm text-center bg-success text-inverse transition-opacity hover:opacity-90 ${
                 !alert?.googleFlightsUrl ? 'pointer-events-none opacity-50' : ''
               }`}
             >
@@ -262,7 +262,7 @@ export default function AlertFlow({
             <button
               onClick={onContinue}
               disabled={loading}
-              className="rounded-lg bg-accent px-3 py-2 text-xs font-semibold text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="py-2 px-6 text-sm bg-accent text-inverse hover:bg-accent-hover transition-colors disabled:opacity-50"
             >
               Continue Monitoring
             </button>
@@ -270,7 +270,7 @@ export default function AlertFlow({
             <button
               onClick={onCancel}
               disabled={loading}
-              className="rounded-lg border border-border bg-background px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
+              className="py-2 px-6 text-sm border border-accent text-accent hover:bg-accent hover:text-inverse transition-colors disabled:opacity-50"
             >
               {search.searchStatus === 'active' ? 'Pause Search' : 'Resume Search'}
             </button>
@@ -278,7 +278,7 @@ export default function AlertFlow({
             <button
               onClick={handleDeleteClick}
               disabled={loading}
-              className="rounded-lg border border-destructive/30 bg-red-50 px-3 py-2 text-xs font-semibold text-destructive transition-colors hover:bg-red-100 disabled:opacity-50"
+              className="py-2 px-6 text-sm bg-danger text-inverse hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               Delete Search
             </button>

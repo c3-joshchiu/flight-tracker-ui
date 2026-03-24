@@ -49,8 +49,8 @@ export default function SearchForm({ onSubmit, loading }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-xl border border-border bg-card p-6 shadow-sm">
-      <h2 className="mb-4 text-lg font-semibold text-card-foreground">New Price Search</h2>
+    <form onSubmit={handleSubmit} className="c3-card">
+      <h2 className="mb-4 text-lg font-semibold text-primary">New Price Search</h2>
 
       {/* Trip type toggle + region filters */}
       <div className="mb-4 flex gap-4">
@@ -60,10 +60,10 @@ export default function SearchForm({ onSubmit, loading }: Props) {
               key={t}
               type="button"
               onClick={() => setTripType(t)}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+              className={`px-4 py-2 text-sm font-medium transition-colors ${
                 tripType === t
                   ? 'bg-accent text-accent-foreground'
-                  : 'bg-muted text-muted-foreground hover:bg-border'
+                  : 'bg-muted text-secondary hover:bg-border'
               }`}
             >
               {t === 'one-way' ? 'One Way' : 'Round Trip'}
@@ -71,11 +71,11 @@ export default function SearchForm({ onSubmit, loading }: Props) {
           ))}
         </div>
 
-        <div className="grid grid-cols-3 content-center gap-x-4 gap-y-1.5 border-l border-border pl-4">
+        <div className="grid grid-cols-3 content-center gap-x-4 gap-y-1.5 border-l border-weak pl-4">
           {REGIONS.map((r) => (
             <label
               key={r.id}
-              className="flex select-none items-center gap-1.5 text-xs text-muted-foreground"
+              className="flex select-none items-center gap-1.5 text-xs text-secondary"
             >
               <input
                 type="checkbox"
@@ -111,7 +111,7 @@ export default function SearchForm({ onSubmit, loading }: Props) {
         />
 
         <div>
-          <label htmlFor="outbound-date" className="mb-1 block text-sm font-medium text-muted-foreground">
+          <label htmlFor="outbound-date" className="mb-1 block text-sm font-medium text-secondary">
             Outbound Date
           </label>
           <input
@@ -120,13 +120,13 @@ export default function SearchForm({ onSubmit, loading }: Props) {
             type="date"
             value={form.outboundDate}
             onChange={(e) => set('outboundDate', e.target.value)}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+            className="w-full text-sm"
           />
         </div>
 
         {tripType === 'round-trip' && (
           <div>
-            <label htmlFor="return-date" className="mb-1 block text-sm font-medium text-muted-foreground">
+            <label htmlFor="return-date" className="mb-1 block text-sm font-medium text-secondary">
               Return Date
             </label>
             <input
@@ -135,18 +135,18 @@ export default function SearchForm({ onSubmit, loading }: Props) {
               type="date"
               value={form.returnDate}
               onChange={(e) => set('returnDate', e.target.value)}
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full text-sm"
             />
           </div>
         )}
 
         <div>
-          <label htmlFor="max-stops" className="mb-1 block text-sm font-medium text-muted-foreground">Max Stops</label>
+          <label htmlFor="max-stops" className="mb-1 block text-sm font-medium text-secondary">Max Stops</label>
           <select
             id="max-stops"
             value={form.maxStops}
             onChange={(e) => set('maxStops', e.target.value)}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+            className="w-full text-sm"
           >
             <option value="">Any</option>
             <option value="0">Non-stop</option>
@@ -156,7 +156,7 @@ export default function SearchForm({ onSubmit, loading }: Props) {
         </div>
 
         <div>
-          <label htmlFor="passengers-adults" className="mb-1 block text-sm font-medium text-muted-foreground">Passengers</label>
+          <label htmlFor="passengers-adults" className="mb-1 block text-sm font-medium text-secondary">Passengers</label>
           <input
             id="passengers-adults"
             type="number"
@@ -164,17 +164,17 @@ export default function SearchForm({ onSubmit, loading }: Props) {
             max={9}
             value={form.passengersAdults}
             onChange={(e) => set('passengersAdults', e.target.value)}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+            className="w-full text-sm"
           />
         </div>
 
         <div>
-          <label htmlFor="currency" className="mb-1 block text-sm font-medium text-muted-foreground">Currency</label>
+          <label htmlFor="currency" className="mb-1 block text-sm font-medium text-secondary">Currency</label>
           <select
             id="currency"
             value={form.currency}
             onChange={(e) => set('currency', e.target.value)}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+            className="w-full text-sm"
           >
             {CURRENCIES.map((c) => (
               <option key={c} value={c}>
@@ -188,7 +188,7 @@ export default function SearchForm({ onSubmit, loading }: Props) {
       <button
         type="submit"
         disabled={loading}
-        className="mt-6 w-full rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+        className="mt-6 w-full py-2 px-6 text-base bg-accent text-inverse hover:bg-accent-hover transition-colors disabled:opacity-50"
       >
         {loading ? 'Creating...' : 'Start Tracking'}
       </button>

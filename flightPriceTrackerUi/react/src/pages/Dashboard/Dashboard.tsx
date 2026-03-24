@@ -5,6 +5,7 @@ import ExportImportDialog from '@/components/ExportImportDialog/ExportImportDial
 import PriceChart from '@/components/PriceChart/PriceChart';
 import SearchForm from '@/components/SearchForm/SearchForm';
 import SearchSelector from '@/components/SearchSelector/SearchSelector';
+import TopNav from '@/components/TopNav/TopNav';
 import { ToastContainer, useToast } from '@/components/Toast/Toast';
 import axios from 'axios';
 import { api } from '@/api';
@@ -179,25 +180,22 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
-          <div>
-            <h1 className="text-lg font-bold text-card-foreground">Flight Price Tracker</h1>
-            <p className="text-xs text-muted-foreground">Monitor prices and get alerts on trends</p>
-          </div>
+    <>
+      <TopNav
+        title="Flight Price Tracker"
+        actions={
           <button
             onClick={() => setShowExportImport(true)}
-            className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-card-foreground transition-colors hover:bg-muted"
+            className="py-1 px-4 text-sm border border-accent text-accent hover:bg-accent hover:text-inverse transition-colors"
           >
             Export / Import
           </button>
-        </div>
-      </header>
+        }
+      />
 
-      <main className="mx-auto max-w-7xl px-6 py-6">
+      <div className="p-4">
         {error && (
-          <div className="mb-4 rounded-lg border border-destructive/30 bg-red-50 px-4 py-2.5 text-sm text-destructive">
+          <div className="mb-4 border border-danger bg-danger-weak px-4 py-2.5 text-sm text-destructive">
             {error}
             <button onClick={() => setError(null)} className="ml-2 font-medium underline">
               Dismiss
@@ -215,8 +213,8 @@ export default function Dashboard() {
               refreshKey={chartRefresh}
             />
           ) : (
-            <div className="flex items-center justify-center rounded-xl border border-dashed border-border">
-              <p className="text-sm text-muted-foreground">Select a search to see price history</p>
+            <div className="flex items-center justify-center border border-dashed border-weak">
+              <p className="text-sm text-secondary">Select a search to see price history</p>
             </div>
           )}
         </div>
@@ -244,13 +242,13 @@ export default function Dashboard() {
             />
           )
         ) : (
-          <div className="flex items-center justify-center rounded-xl border border-dashed border-border py-16">
-            <p className="text-sm text-muted-foreground">
+          <div className="flex items-center justify-center border border-dashed border-weak py-16">
+            <p className="text-sm text-secondary">
               Create a search or select one from the dropdown to see price alerts.
             </p>
           </div>
         )}
-      </main>
+      </div>
 
       <ToastContainer toasts={toasts} />
 
@@ -263,6 +261,6 @@ export default function Dashboard() {
           showToast('Import complete');
         }}
       />
-    </div>
+    </>
   );
 }

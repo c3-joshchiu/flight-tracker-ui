@@ -23,14 +23,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     if (this.state.hasError) {
       return (
         <div className="flex min-h-screen items-center justify-center bg-background p-8">
-          <div className="max-w-md rounded-xl border border-destructive/30 bg-card p-6 shadow-lg">
+          <div className="c3-card max-w-md border border-danger">
             <h2 className="mb-2 text-lg font-semibold text-destructive">Something went wrong</h2>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-secondary">
               {this.state.error?.message || 'An unexpected error occurred.'}
             </p>
             <button
               onClick={() => this.setState({ hasError: false, error: null })}
-              className="mt-4 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground"
+              className="mt-4 py-2 px-6 text-base bg-accent text-inverse hover:bg-accent-hover transition-colors"
             >
               Try Again
             </button>
