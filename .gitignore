@@ -13,6 +13,7 @@ dist/
 **/jsconfig.json
 .vs-cache
 .c3nbrc.js
+flightPriceTrackerUi/react-template/
 
 # IDE
 .vscode/
