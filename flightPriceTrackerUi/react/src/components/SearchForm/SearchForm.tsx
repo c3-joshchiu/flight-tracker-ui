@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import AirportCombobox from '@/components/AirportCombobox/AirportCombobox';
+import ThemedSelect from '@/components/ThemedSelect/ThemedSelect';
 import { REGIONS, type Region } from '@/data/airports';
 import type { SearchCreateInput } from '@/Interfaces';
 
@@ -142,17 +143,17 @@ export default function SearchForm({ onSubmit, loading }: Props) {
 
         <div>
           <label htmlFor="max-stops" className="mb-1 block text-sm font-medium text-secondary">Max Stops</label>
-          <select
+          <ThemedSelect
             id="max-stops"
             value={form.maxStops}
-            onChange={(e) => set('maxStops', e.target.value)}
-            className="w-full text-sm"
-          >
-            <option value="">Any</option>
-            <option value="0">Non-stop</option>
-            <option value="1">1 stop</option>
-            <option value="2">2 stops</option>
-          </select>
+            onChange={(v) => set('maxStops', v)}
+            options={[
+              { value: '', label: 'Any' },
+              { value: '0', label: 'Non-stop' },
+              { value: '1', label: '1 stop' },
+              { value: '2', label: '2 stops' },
+            ]}
+          />
         </div>
 
         <div>
@@ -170,18 +171,12 @@ export default function SearchForm({ onSubmit, loading }: Props) {
 
         <div>
           <label htmlFor="currency" className="mb-1 block text-sm font-medium text-secondary">Currency</label>
-          <select
+          <ThemedSelect
             id="currency"
             value={form.currency}
-            onChange={(e) => set('currency', e.target.value)}
-            className="w-full text-sm"
-          >
-            {CURRENCIES.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
+            onChange={(v) => set('currency', v)}
+            options={CURRENCIES.map((c) => ({ value: c, label: c }))}
+          />
         </div>
       </div>
 
