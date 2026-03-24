@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "scripts": {
     "prepare": "cd ../.. && npx husky",
-    "predev": "npx kendo-ui-license activate",
     "dev": "vite",
+    "dev:proxy": "node --env-file=.env dev-proxy/server.mjs",
+    "dev:all": "npx concurrently -n proxy,vite -c blue,green \"npm run dev:proxy\" \"npm run dev\"",
     "build": "tsc && vite build",
     "postbuild": "node ./scripts/postBuild.js",
     "generate:api": "openapi-typescript ../../openapi/flights-api.yaml -o src/api.generated.ts",

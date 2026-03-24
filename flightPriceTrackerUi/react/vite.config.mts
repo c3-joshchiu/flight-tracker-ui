@@ -46,6 +46,10 @@ export default defineConfig(({ mode }) => {
         "^/remote": `${baseUrl}/${env.VITE_C3_ENV}/${env.VITE_C3_APP}/`,
         "^/thirdparty": `${baseUrl}/${env.VITE_C3_ENV}/${env.VITE_C3_APP}/`,
         "^/typesys": `${baseUrl}/${env.VITE_C3_ENV}/${env.VITE_C3_APP}/`,
+        "^/flights": {
+          target: "http://localhost:3001",
+          changeOrigin: true,
+        },
       },
     },
     base: "./",
