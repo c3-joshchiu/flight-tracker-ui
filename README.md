@@ -75,7 +75,12 @@ flightPriceTrackerUi/
 │   │   ├── App.tsx                   # Root component (HashRouter)
 │   │   ├── main.tsx                  # Entry point
 │   │   ├── components/               # UI components
+│   │   │   ├── ExportImportDialog/  # Export/import modal (CSV, XLSX, JSON)
+│   │   │   └── ...                  # Other components
 │   │   ├── pages/                    # Page components
+│   │   ├── utils/
+│   │   │   ├── download.ts          # Blob download helper
+│   │   │   └── csvParser.ts         # Two-section CSV parser for import
 │   │   └── data/
 │   │       └── airports.json         # Static IATA airport dataset
 │   ├── scripts/
@@ -91,6 +96,19 @@ flightPriceTrackerUi/
 └── openapi/
     └── flights-api.yaml              # Mirrored from API repo (for codegen)
 ```
+
+## Export / Import
+
+The Dashboard header contains an "Export / Import" button that opens a modal
+dialog supporting:
+
+**Export:** Download non-seed data in CSV, XLSX, or JSON format. Scope
+can be all searches or the currently selected search. XLSX is generated
+client-side using SheetJS; CSV/JSON are fetched from the backend.
+
+**Import:** Upload a `.json` or `.csv` export file. Conflict strategies:
+skip existing records (default) or overwrite. The import report shows
+created/skipped/overwritten counts and any errors.
 
 ## Development
 
@@ -167,39 +185,29 @@ configured via the `prepare` script in `package.json`.
 
 ## Updating API Types
 
-When the backend API changes:
-
-1. Copy the updated spec from the API repo:
-
-```bash
-cp ../flightTrackerApi/openapi/flights-api.yaml openapi/
-```
-
-2. Regenerate TypeScript types:
-
-```bash
-cd flightPriceTrackerUi/react
-npm run generate:api
-```
-
-3. Fix any type errors:
-
-```bash
-npx tsc --noEmit
-```
-
-4. Build and commit:
-
-```bash
-npm run build
-git add -A && git commit -m "update types from API spec"
-```
-
-Or use the helper script:
+When the backend API changes, run the sync script from the UI repo root:
 
 ```bash
 bash flightPriceTrackerUi/react/scripts/generate-client.sh
 ```
+
+This single command:
+
+1. **Mirrors** `flights-api.yaml` from the API repo (if it detects changes)
+2. **Regenerates** `api.generated.ts` via `openapi-typescript`
+3. **Type-checks** with `tsc --noEmit` and fails early on breaking changes
+
+Then build and commit:
+
+```bash
+cd flightPriceTrackerUi/react
+npm run build
+git add -A && git commit -m "update types from API spec"
+```
+
+> **Manual alternative** — if the repos aren't siblings on disk, copy the spec
+> yourself (`cp /path/to/flightTrackerApi/openapi/flights-api.yaml openapi/`)
+> and run `npm run generate:api` from `flightPriceTrackerUi/react`.
 
 ## Package Independence
 

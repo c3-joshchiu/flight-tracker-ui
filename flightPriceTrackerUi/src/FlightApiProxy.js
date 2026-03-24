@@ -53,16 +53,22 @@ function _proxy(subPath, req) {
   var targetUrl = _targetUrl(subPath, req);
 
   // Verified API: HttpRequest.make({method, url}).withHeader().sendSync() → HttpResponse
+  var inboundContentType = req.header('Content-Type') || 'application/json';
   var outbound = HttpRequest.make({
     method: req.method,
     url:    targetUrl
   }).withHeader('Authorization', 'Bearer ' + token)
-    .withHeader('Content-Type', 'application/json');
+    .withHeader('Content-Type', inboundContentType);
+
+  var accept = req.header('Accept');
+  if (accept) {
+    outbound = outbound.withHeader('Accept', accept);
+  }
 
   if (req.method === 'POST' || req.method === 'PATCH' || req.method === 'PUT') {
     var body = req.readBodyString();
     if (body) {
-      outbound = outbound.withBodyString(body, 'application/json');
+      outbound = outbound.withBodyString(body, inboundContentType);
     }
   }
 
@@ -80,12 +86,24 @@ function _proxy(subPath, req) {
     return req.emptyResponse();
   }
 
-  // responseFromJson sets Content-Type: application/json so axios auto-parses.
-  // responseFromText would return plain text causing axios to leave r.data as a string.
-  try {
-    return req.responseFromJson(JSON.parse(respBody));
-  } catch (e) {
-    return req.responseFromText(respBody);
+  // Content-type-aware response relay: JSON uses responseFromJson, everything else
+  // uses responseFromContent to preserve the original Content-Type (e.g. CSV)
+  var respContentType = apiResp.header('Content-Type') || 'application/json';
+
+  if (respContentType.indexOf('application/json') !== -1) {
+    try {
+      return req.responseFromJson(JSON.parse(respBody));
+    } catch (e) {
+      return req.responseFromText(respBody);
+    }
+  } else {
+    var content = ContentValue.fromString(respBody, respContentType);
+    var response = req.responseFromContent(content);
+    var disposition = apiResp.header('Content-Disposition');
+    if (disposition) {
+      response = response.withHeader('Content-Disposition', disposition);
+    }
+    return response;
   }
 }
 

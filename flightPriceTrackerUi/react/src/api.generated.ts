@@ -29,14 +29,23 @@ export interface paths {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                /**
+                 * @description FlightSearch entity ID (e.g. `seed_search_lax_nrt`)
+                 * @example seed_search_lax_nrt
+                 */
+                id: components["parameters"]["SearchId"];
+            };
             cookie?: never;
         };
         /** Get a single search by ID */
         get: operations["getSearch"];
         put?: never;
         post?: never;
-        /** Delete a search and all its snapshots */
+        /**
+         * Delete a search and all its snapshots
+         * @description Permanently removes the search and all associated PriceSnapshot records.
+         */
         delete: operations["deleteSearch"];
         options?: never;
         head?: never;
@@ -48,12 +57,21 @@ export interface paths {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                /**
+                 * @description FlightSearch entity ID (e.g. `seed_search_lax_nrt`)
+                 * @example seed_search_lax_nrt
+                 */
+                id: components["parameters"]["SearchId"];
+            };
             cookie?: never;
         };
         /**
          * Compute price trend alert
-         * @description Analyzes the last 14 days of economy snapshots to detect price trends. Red: 5+ of 7 current-week daily prices exceed previous week. Green: Current week average is 20%+ lower than previous week. Grey: Insufficient data or no significant change.
+         * @description Analyzes the last 14 days of economy snapshots to detect price trends.
+         *     - **Red:** 5+ of 7 current-week daily prices exceed previous week.
+         *     - **Green:** Current week average is 20%+ lower than previous week.
+         *     - **Grey:** Insufficient data or no significant change.
          */
         get: operations["getAlert"];
         put?: never;
@@ -68,7 +86,13 @@ export interface paths {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                /**
+                 * @description FlightSearch entity ID (e.g. `seed_search_lax_nrt`)
+                 * @example seed_search_lax_nrt
+                 */
+                id: components["parameters"]["SearchId"];
+            };
             cookie?: never;
         };
         /** Price history for a search */
@@ -85,7 +109,13 @@ export interface paths {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                /**
+                 * @description FlightSearch entity ID (e.g. `seed_search_lax_nrt`)
+                 * @example seed_search_lax_nrt
+                 */
+                id: components["parameters"]["SearchId"];
+            };
             cookie?: never;
         };
         /** Most recent economy snapshot */
@@ -102,16 +132,101 @@ export interface paths {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                /**
+                 * @description FlightSearch entity ID (e.g. `seed_search_lax_nrt`)
+                 * @example seed_search_lax_nrt
+                 */
+                id: components["parameters"]["SearchId"];
+            };
             cookie?: never;
         };
         get?: never;
         put?: never;
         /**
          * Trigger live price scrape
-         * @description Scrapes Google Flights for both economy and business classes. Silently skips seat classes where the live fetch fails (no mock fallback).
+         * @description Scrapes Google Flights for both economy and business classes.
+         *     Returns 0-2 snapshots depending on which seat classes succeed.
+         *     No request body required.
          */
         post: operations["triggerFetch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export all non-seed data
+         * @description Returns all user-created searches and their price snapshots.
+         *     Seed/test data (isTestData=true) is excluded.
+         */
+        get: operations["exportData"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/export/searches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export searches only */
+        get: operations["exportSearches"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/export/snapshots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export snapshots */
+        get: operations["exportSnapshots"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Import data (idempotent upsert)
+         * @description Imports searches and/or snapshots. Uses natural keys for
+         *     deduplication. PUT semantics — uploading the same data twice
+         *     is a no-op (with conflictStrategy=skip).
+         */
+        put: operations["importData"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -122,112 +237,354 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * @description A tracked flight search with its criteria and status.
+         *
+         *     **C3 serialization note:** Single-entity responses (getById, create,
+         *     update) include a `"type": "FlightSearch"` field. Collection responses
+         *     (listSearches) omit it. Consumers should ignore `type` during parsing.
+         */
         FlightSearch: {
+            /**
+             * @description C3 type discriminator. Present on single-entity responses, absent on collections.
+             * @example FlightSearch
+             */
+            readonly type?: string;
+            /**
+             * @description Unique entity identifier
+             * @example seed_search_sfo_lhr
+             */
             id: string;
-            /** @description C3 auto-generated name field */
-            name?: string;
-            /** @description IATA airport code (e.g. "LAX") */
+            /**
+             * @description C3 entity version for optimistic locking
+             * @example 1
+             */
+            readonly version?: number;
+            meta?: components["schemas"]["Meta"];
+            /**
+             * @description Departure airport IATA code (uppercased server-side)
+             * @example SFO
+             */
             fromAirport: string;
-            /** @description IATA airport code (e.g. "NRT") */
+            /**
+             * @description Destination airport IATA code (uppercased server-side)
+             * @example LHR
+             */
             toAirport: string;
-            /** @enum {string} */
+            /**
+             * @example round-trip
+             * @enum {string}
+             */
             tripType: "one-way" | "round-trip";
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Outbound flight date (ISO 8601)
+             * @example 2026-04-19T00:00:00Z
+             */
             outboundDate: string;
-            /** Format: date-time */
-            returnDate?: string | null;
-            maxStops?: number | null;
-            /** @default 1 */
+            /**
+             * Format: date-time
+             * @description Return date for round-trip. Absent (not null) when not applicable.
+             * @example 2026-04-29T00:00:00Z
+             */
+            returnDate?: string;
+            /** @description Maximum stops allowed. Absent when unset. */
+            maxStops?: number;
+            /**
+             * @default 1
+             * @example 2
+             */
             passengersAdults: number;
+            /** @example en-US */
             language?: string;
+            /** @example USD */
             currency?: string;
-            /** @enum {string} */
+            /**
+             * @example active
+             * @enum {string}
+             */
             searchStatus: "active" | "disabled";
+            /** @example false */
             isTestData?: boolean;
-            /** @description C3 entity version (optimistic locking) */
-            version?: number;
-            meta?: components["schemas"]["Meta"];
         };
+        /**
+         * @description A single price data point for a flight search.
+         *     Prices are in **cents** (integer) — divide by 100 for display.
+         */
         PriceSnapshot: {
+            /** @example PriceSnapshot */
+            readonly type?: string;
+            /** @example seed_snap_lax_nrt_economy_83 */
             id: string;
-            /** @description C3 auto-generated name field */
-            name?: string;
-            /** @description Parent search (full entity or ID reference) */
-            flightSearch: components["schemas"]["FlightSearch"] | {
-                id?: string;
-            };
-            /** @enum {string} */
-            seatClass: "economy" | "business";
-            /** @description Price in cents (e.g. 85000 = $850) */
-            price: number;
-            /** @description IATA airline codes */
-            airlineCodes?: string[];
-            airlineNames?: string[];
-            /** @description "direct", "1 stop", etc. */
-            flightType?: string;
-            durationMinutes?: number | null;
-            /** Format: date-time */
-            fetchedAt: string;
-            version?: number;
+            readonly version?: number;
             meta?: components["schemas"]["Meta"];
+            flightSearch: components["schemas"]["EntityRef"];
+            /**
+             * @example economy
+             * @enum {string}
+             */
+            seatClass: "economy" | "business";
+            /**
+             * @description Price in cents (e.g. 92148 = $921.48)
+             * @example 92148
+             */
+            price: number;
+            /**
+             * @description IATA airline codes
+             * @example [
+             *       "NH",
+             *       "AA"
+             *     ]
+             */
+            airlineCodes?: string[];
+            /**
+             * @example [
+             *       "All Nippon Airways",
+             *       "American Airlines"
+             *     ]
+             */
+            airlineNames?: string[];
+            /**
+             * @description Route type: 'direct', '1 stop', '2 stops', etc.
+             * @example 1 stop
+             */
+            flightType?: string;
+            /**
+             * @description Total flight duration in minutes. Absent when unknown.
+             * @example 730
+             */
+            durationMinutes?: number;
+            /**
+             * Format: date-time
+             * @description When this price was scraped
+             * @example 2026-03-06T17:55:19Z
+             */
+            fetchedAt: string;
         };
+        /** @description Price trend analysis based on the last 14 days of economy snapshots. */
         AlertResult: {
+            /** @example seed_search_lax_nrt */
             searchId: string;
-            /** @enum {string} */
+            /**
+             * @description - `red` — 5+ of 7 current-week daily prices exceed previous week
+             *     - `green` — current week average is 20%+ lower than previous week
+             *     - `grey` — insufficient data or no significant change
+             * @example green
+             * @enum {string}
+             */
             status: "red" | "green" | "grey";
-            /** @description Human-readable alert description */
+            /**
+             * @description Human-readable alert description
+             * @example Prices dropped 22% vs. last week
+             */
             message: string;
-            /** @description Average daily min price this week (cents) */
-            currentWeekAvg?: number | null;
-            /** @description Average daily min price last week (cents) */
-            previousWeekAvg?: number | null;
-            /** @description Week-over-week percent change */
-            percentChange?: number | null;
-            /** @description Days where current week price > previous week */
-            daysRising?: number | null;
-            /** @description Name of cheapest airline from latest snapshot */
-            cheapestAirline?: string | null;
-            /** @description Protobuf-encoded Google Flights search URL */
-            googleFlightsUrl?: string | null;
+            /**
+             * @description Average daily minimum price this week (cents)
+             * @example 78200
+             */
+            currentWeekAvg?: number;
+            /**
+             * @description Average daily minimum price last week (cents)
+             * @example 100300
+             */
+            previousWeekAvg?: number;
+            /**
+             * @description Week-over-week percent change (negative = cheaper)
+             * @example -22.03
+             */
+            percentChange?: number;
+            /**
+             * @description Count of days where current week price > previous week
+             * @example 1
+             */
+            daysRising?: number;
+            /**
+             * @description Airline name from the cheapest option in the latest snapshot
+             * @example All Nippon Airways
+             */
+            cheapestAirline?: string;
+            /**
+             * Format: uri
+             * @description Pre-built Google Flights URL for this search
+             * @example https://www.google.com/travel/flights/search?tfs=...
+             */
+            googleFlightsUrl?: string;
         };
         SearchCreateInput: {
-            /** @description IATA airport code */
+            /**
+             * @description IATA airport code (uppercased server-side)
+             * @example SFO
+             */
             fromAirport: string;
-            /** @description IATA airport code */
+            /**
+             * @description IATA airport code (uppercased server-side)
+             * @example LHR
+             */
             toAirport: string;
             /**
              * @default one-way
              * @enum {string}
              */
             tripType: "one-way" | "round-trip";
-            /** Format: date */
+            /**
+             * Format: date
+             * @description ISO date (e.g. "2026-04-19")
+             * @example 2026-04-19
+             */
             outboundDate: string;
-            /** Format: date */
+            /**
+             * Format: date
+             * @description Required when tripType is "round-trip"
+             * @example 2026-04-29
+             */
+            returnDate?: string;
+            maxStops?: number;
+            /** @default 1 */
+            passengersAdults: number;
+            /** @default USD */
+            currency: string;
+        };
+        /**
+         * @description C3 foreign key reference. Always serialized as an object with only `id`.
+         *     Never expanded to the full entity in this API's responses.
+         * @example {
+         *       "id": "seed_search_lax_nrt"
+         *     }
+         */
+        EntityRef: {
+            id: string;
+        };
+        /**
+         * @description C3 entity metadata. Consumers should treat this as opaque.
+         *     Only `created` and `updated` are reliably useful.
+         */
+        Meta: {
+            /**
+             * Format: int64
+             * @description Internal C3 application identifier
+             */
+            appCode?: number;
+            /** @description C3 environment name */
+            env?: string;
+            /** @description C3 application name */
+            app?: string;
+            /** Format: date-time */
+            created?: string;
+            createdBy?: string;
+            /** Format: date-time */
+            updated?: string;
+            updatedBy?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            fetchInclude?: string;
+            fetchType?: string;
+        };
+        /**
+         * @description Error response body returned by the API handler
+         * @example {
+         *       "error": "fromAirport, toAirport, and outboundDate are required",
+         *       "status": 400
+         *     }
+         */
+        ApiError: {
+            /** @description Human-readable error message */
+            error?: string;
+            /** @description HTTP status code */
+            status?: number;
+        };
+        /** @description Envelope for exported data containing searches and snapshots. */
+        ExportData: {
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp when the export was generated
+             */
+            exportedAt?: string;
+            /**
+             * @description Export format version for backward compatibility
+             * @example 1.0
+             */
+            version?: string;
+            searches?: components["schemas"]["ExportedSearch"][];
+            snapshots?: components["schemas"]["ExportedSnapshot"][];
+        };
+        ExportedSearch: {
+            id: string;
+            fromAirport: string;
+            toAirport: string;
+            /** @enum {string} */
+            tripType: "one-way" | "round-trip";
+            outboundDate: string;
             returnDate?: string | null;
             maxStops?: number | null;
             /** @default 1 */
             passengersAdults: number;
             /** @default USD */
             currency: string;
+            /** @enum {string} */
+            searchStatus?: "active" | "disabled";
+            /** @description Number of associated snapshots (convenience field) */
+            snapshotCount?: number;
         };
-        Meta: {
+        ExportedSnapshot: {
+            id: string;
+            /** @description ID of the parent search (flattened from C3 FK reference) */
+            flightSearchId: string;
+            /** @enum {string} */
+            seatClass: "economy" | "business";
+            /** @description Price in cents */
+            price: number;
+            airlineCodes?: string[];
+            airlineNames?: string[];
+            flightType?: string | null;
+            durationMinutes?: number | null;
             /** Format: date-time */
-            created?: string;
-            /** Format: date-time */
-            updated?: string;
+            fetchedAt: string;
         };
-        ApiError: {
+        /** @description Request body for PUT /import */
+        ImportPayload: {
+            searches?: components["schemas"]["ExportedSearch"][];
+            snapshots?: components["schemas"]["ExportedSnapshot"][];
+            /**
+             * @description How to handle records that already exist (matched by natural key):
+             *     - skip: keep existing, skip import record
+             *     - overwrite: replace existing with import data
+             *     - error: return error listing all conflicts
+             * @default skip
+             * @enum {string}
+             */
+            conflictStrategy: "skip" | "overwrite" | "error";
+        };
+        /** @description Result of an import operation */
+        ImportReport: {
+            /** @example completed */
+            status?: string;
+            searches?: components["schemas"]["ImportEntityReport"];
+            snapshots?: components["schemas"]["ImportEntityReport"];
+        };
+        ImportEntityReport: {
+            created?: number;
+            skipped?: number;
+            overwritten?: number;
+            errors?: components["schemas"]["ImportError"][];
+        };
+        ImportError: {
+            id?: string;
             error?: string;
-            status?: number;
         };
     };
     responses: {
-        /** @description Invalid request */
+        /** @description Invalid request — missing required fields or invalid values */
         BadRequest: {
             headers: {
                 [name: string]: unknown;
             };
             content: {
+                /**
+                 * @example {
+                 *       "error": "fromAirport, toAirport, and outboundDate are required",
+                 *       "status": 400
+                 *     }
+                 */
                 "application/json": components["schemas"]["ApiError"];
             };
         };
@@ -237,12 +594,33 @@ export interface components {
                 [name: string]: unknown;
             };
             content: {
+                /**
+                 * @example {
+                 *       "error": "Search not found",
+                 *       "status": 404
+                 *     }
+                 */
                 "application/json": components["schemas"]["ApiError"];
             };
         };
+        /**
+         * @description Missing, expired, or invalid Bearer token.
+         *     The C3 platform may return `302` (redirect to IdP) instead of `401`
+         *     when no Authorization header is present. Clients should treat both
+         *     302 and 401 as "re-acquire token and retry".
+         */
+        Unauthorized: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content?: never;
+        };
     };
     parameters: {
-        /** @description FlightSearch entity ID */
+        /**
+         * @description FlightSearch entity ID (e.g. `seed_search_lax_nrt`)
+         * @example seed_search_lax_nrt
+         */
         SearchId: string;
     };
     requestBodies: never;
@@ -266,9 +644,28 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example [
+                     *       {
+                     *         "id": "seed_search_sfo_lhr",
+                     *         "version": 1,
+                     *         "fromAirport": "SFO",
+                     *         "toAirport": "LHR",
+                     *         "tripType": "round-trip",
+                     *         "outboundDate": "2026-04-19T00:00:00Z",
+                     *         "returnDate": "2026-04-29T00:00:00Z",
+                     *         "passengersAdults": 2,
+                     *         "language": "en-US",
+                     *         "currency": "USD",
+                     *         "searchStatus": "active",
+                     *         "isTestData": true
+                     *       }
+                     *     ]
+                     */
                     "application/json": components["schemas"]["FlightSearch"][];
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     createSearch: {
@@ -280,6 +677,16 @@ export interface operations {
         };
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "fromAirport": "SFO",
+                 *       "toAirport": "LHR",
+                 *       "outboundDate": "2026-04-19",
+                 *       "tripType": "round-trip",
+                 *       "returnDate": "2026-04-29",
+                 *       "passengersAdults": 2
+                 *     }
+                 */
                 "application/json": components["schemas"]["SearchCreateInput"];
             };
         };
@@ -294,6 +701,7 @@ export interface operations {
                 };
             };
             400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
         };
     };
     getSearch: {
@@ -301,7 +709,10 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description FlightSearch entity ID */
+                /**
+                 * @description FlightSearch entity ID (e.g. `seed_search_lax_nrt`)
+                 * @example seed_search_lax_nrt
+                 */
                 id: components["parameters"]["SearchId"];
             };
             cookie?: never;
@@ -317,6 +728,7 @@ export interface operations {
                     "application/json": components["schemas"]["FlightSearch"];
                 };
             };
+            401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
         };
     };
@@ -325,7 +737,10 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description FlightSearch entity ID */
+                /**
+                 * @description FlightSearch entity ID (e.g. `seed_search_lax_nrt`)
+                 * @example seed_search_lax_nrt
+                 */
                 id: components["parameters"]["SearchId"];
             };
             cookie?: never;
@@ -339,6 +754,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
         };
     };
@@ -347,13 +763,21 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description FlightSearch entity ID */
+                /**
+                 * @description FlightSearch entity ID (e.g. `seed_search_lax_nrt`)
+                 * @example seed_search_lax_nrt
+                 */
                 id: components["parameters"]["SearchId"];
             };
             cookie?: never;
         };
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "searchStatus": "disabled"
+                 *     }
+                 */
                 "application/json": {
                     /** @enum {string} */
                     searchStatus: "active" | "disabled";
@@ -371,6 +795,7 @@ export interface operations {
                 };
             };
             400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
         };
     };
@@ -379,7 +804,10 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description FlightSearch entity ID */
+                /**
+                 * @description FlightSearch entity ID (e.g. `seed_search_lax_nrt`)
+                 * @example seed_search_lax_nrt
+                 */
                 id: components["parameters"]["SearchId"];
             };
             cookie?: never;
@@ -392,20 +820,37 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "searchId": "seed_search_lax_nrt",
+                     *       "status": "green",
+                     *       "message": "Prices dropped 22% vs. last week",
+                     *       "currentWeekAvg": 78200,
+                     *       "previousWeekAvg": 100300,
+                     *       "percentChange": -22.03,
+                     *       "daysRising": 1,
+                     *       "cheapestAirline": "All Nippon Airways",
+                     *       "googleFlightsUrl": "https://www.google.com/travel/flights/search?tfs=..."
+                     *     }
+                     */
                     "application/json": components["schemas"]["AlertResult"];
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     getPrices: {
         parameters: {
             query?: {
-                /** @description Filter by seat class (omit for all classes) */
+                /** @description Filter by seat class. Omit to return all classes. */
                 seatClass?: "economy" | "business";
             };
             header?: never;
             path: {
-                /** @description FlightSearch entity ID */
+                /**
+                 * @description FlightSearch entity ID (e.g. `seed_search_lax_nrt`)
+                 * @example seed_search_lax_nrt
+                 */
                 id: components["parameters"]["SearchId"];
             };
             cookie?: never;
@@ -421,6 +866,7 @@ export interface operations {
                     "application/json": components["schemas"]["PriceSnapshot"][];
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     getLatestPrice: {
@@ -428,7 +874,10 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description FlightSearch entity ID */
+                /**
+                 * @description FlightSearch entity ID (e.g. `seed_search_lax_nrt`)
+                 * @example seed_search_lax_nrt
+                 */
                 id: components["parameters"]["SearchId"];
             };
             cookie?: never;
@@ -444,6 +893,7 @@ export interface operations {
                     "application/json": components["schemas"]["PriceSnapshot"] | null;
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     triggerFetch: {
@@ -451,14 +901,17 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description FlightSearch entity ID */
+                /**
+                 * @description FlightSearch entity ID (e.g. `seed_search_lax_nrt`)
+                 * @example seed_search_lax_nrt
+                 */
                 id: components["parameters"]["SearchId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Newly fetched snapshots (0-2 items depending on scrape success) */
+            /** @description Newly fetched snapshots (0-2 items) */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -467,7 +920,108 @@ export interface operations {
                     "application/json": components["schemas"]["PriceSnapshot"][];
                 };
             };
+            401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
+        };
+    };
+    exportData: {
+        parameters: {
+            query?: {
+                format?: "csv" | "json";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Export data in the requested format */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExportData"];
+                    "text/csv": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    exportSearches: {
+        parameters: {
+            query?: {
+                format?: "csv" | "json";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Searches export */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExportData"];
+                    "text/csv": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    exportSnapshots: {
+        parameters: {
+            query?: {
+                format?: "csv" | "json";
+                /** @description Filter to a single search. Omit for all non-seed searches. */
+                searchId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Snapshots export */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExportData"];
+                    "text/csv": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    importData: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportPayload"];
+            };
+        };
+        responses: {
+            /** @description Import report */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportReport"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
         };
     };
 }

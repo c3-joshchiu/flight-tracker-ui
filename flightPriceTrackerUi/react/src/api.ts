@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AlertResult, FlightSearch, PriceSnapshot, SearchCreateInput } from '@/Interfaces';
+import type { AlertResult, ExportData, FlightSearch, ImportPayload, ImportReport, PriceSnapshot, SearchCreateInput } from '@/Interfaces';
 import { getApiBase } from '@/config';
 
 const BASE = getApiBase();
@@ -82,5 +82,34 @@ export const api = {
   alerts: {
     get: (searchId: string): Promise<AlertResult> =>
       axios.get(`${BASE}/searches/${searchId}/alert`).then((r) => unwrapOne<AlertResult>(r.data)),
+  },
+
+  data: {
+    exportAll: (format: 'csv' | 'json'): Promise<string | ExportData> => {
+      if (format === 'json') {
+        return axios.get(`${BASE}/export`, { params: { format } })
+          .then((r) => r.data as ExportData);
+      }
+      return axios.get(`${BASE}/export`, {
+        params: { format },
+        responseType: 'text',
+        transformResponse: [(data: string) => data],
+      }).then((r) => r.data as string);
+    },
+
+    exportSearch: (searchId: string, format: 'csv' | 'json'): Promise<string | ExportData> => {
+      if (format === 'json') {
+        return axios.get(`${BASE}/export/snapshots`, { params: { format, searchId } })
+          .then((r) => r.data as ExportData);
+      }
+      return axios.get(`${BASE}/export/snapshots`, {
+        params: { format, searchId },
+        responseType: 'text',
+        transformResponse: [(data: string) => data],
+      }).then((r) => r.data as string);
+    },
+
+    importData: (data: ImportPayload): Promise<ImportReport> =>
+      axios.put(`${BASE}/import`, data).then((r) => unwrapOne<ImportReport>(r.data)),
   },
 };
