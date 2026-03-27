@@ -170,13 +170,13 @@ export default function PriceChart({ searchId, route, refreshKey }: Props) {
   const pointCount = snapshots.length;
 
   return (
-    <div className="flex h-full flex-col rounded-xl border border-border bg-card p-4 shadow-sm">
+    <div className="c3-card h-full flex flex-col">
       <div className="mb-3 flex items-baseline justify-between">
         <div>
-          <h2 className="text-sm font-semibold text-card-foreground">Price History</h2>
-          <p className="text-xs text-muted-foreground">{route} &mdash; each fetch</p>
+          <h2 className="text-sm font-semibold text-primary">Price History</h2>
+          <p className="text-xs text-secondary">{route} &mdash; each fetch</p>
         </div>
-        <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+        <div className="flex items-center gap-3 text-[11px] text-secondary">
           <span className="flex items-center gap-1">
             <span className="inline-block h-1.5 w-3 rounded-full bg-[var(--chart-economy)]" />
             Economy
@@ -189,11 +189,11 @@ export default function PriceChart({ searchId, route, refreshKey }: Props) {
       </div>
 
       {loading ? (
-        <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
+        <div className="flex flex-1 items-center justify-center text-sm text-secondary">
           Loading...
         </div>
       ) : chartData.length === 0 ? (
-        <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
+        <div className="flex flex-1 items-center justify-center text-sm text-secondary">
           No price data yet.
         </div>
       ) : (
@@ -214,7 +214,7 @@ export default function PriceChart({ searchId, route, refreshKey }: Props) {
                     x2={PAD.left + PLOT_W}
                     y1={y}
                     y2={y}
-                    stroke="var(--color-border)"
+                    stroke="var(--c3-style-colorBorderWeak)"
                     strokeWidth={0.5}
                   />
                   <text
@@ -222,7 +222,7 @@ export default function PriceChart({ searchId, route, refreshKey }: Props) {
                     y={y + 3}
                     textAnchor="end"
                     fontSize={9}
-                    fill="var(--color-muted-foreground)"
+                    fill="var(--c3-style-colorFgSecondary)"
                   >
                     ${tick}
                   </text>
@@ -239,7 +239,7 @@ export default function PriceChart({ searchId, route, refreshKey }: Props) {
                   y={CHART_H - 4}
                   textAnchor="middle"
                   fontSize={8}
-                  fill="var(--color-muted-foreground)"
+                  fill="var(--c3-style-colorFgSecondary)"
                   transform={`rotate(-40, ${PAD.left + (i / Math.max(chartData.length - 1, 1)) * PLOT_W}, ${CHART_H - 4})`}
                 >
                   {pt.label}
@@ -320,7 +320,7 @@ export default function PriceChart({ searchId, route, refreshKey }: Props) {
         </div>
       )}
 
-      <p className="mt-1 text-right text-[11px] text-muted-foreground">
+      <p className="mt-1 text-right text-[11px] text-secondary">
         {pointCount} quote{pointCount !== 1 ? 's' : ''}
       </p>
     </div>

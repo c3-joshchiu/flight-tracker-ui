@@ -34,7 +34,7 @@ export function ToastContainer({ toasts }: { toasts: ToastItem[] }) {
           className={`animate-slide-in rounded-lg px-4 py-2.5 text-sm font-medium shadow-lg ${
             t.type === 'success'
               ? 'border border-toast-success-border bg-toast-success-bg text-toast-success-text'
-              : 'border border-destructive/30 bg-red-50 text-destructive'
+              : 'border border-danger bg-danger-weak text-danger'
           }`}
         >
           <span className="mr-2">{t.type === 'success' ? '\u2713' : '\u2715'}</span>

@@ -137,12 +137,12 @@ export default function ExportImportDialog({ open, onClose, selectedSearchId, on
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
       <div
-        className="relative mx-4 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl border border-border bg-card p-6 shadow-xl"
+        className="c3-card relative mx-4 max-h-[90vh] w-full max-w-lg overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-card-foreground">Export / Import Data</h2>
-          <button onClick={onClose} className="text-muted-foreground transition-colors hover:text-card-foreground">
+          <h2 className="text-base font-semibold text-primary">Export / Import Data</h2>
+          <button onClick={onClose} className="text-secondary transition-colors hover:text-primary">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
@@ -150,14 +150,14 @@ export default function ExportImportDialog({ open, onClose, selectedSearchId, on
         </div>
 
         {/* ── Export Section ──────────────────────────────── */}
-        <div className="mb-5 rounded-lg border border-border bg-background p-4">
-          <h3 className="mb-3 text-sm font-medium text-card-foreground">Export</h3>
+        <div className="mb-5 border border-weak bg-secondary p-4">
+          <h3 className="mb-3 text-sm font-medium text-primary">Export</h3>
 
           <div className="mb-3">
-            <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Format</label>
+            <label className="mb-1.5 block text-xs font-medium text-secondary">Format</label>
             <div className="flex gap-3">
               {(['csv', 'xlsx', 'json'] as const).map((f) => (
-                <label key={f} className="flex items-center gap-1.5 text-xs text-card-foreground">
+                <label key={f} className="flex items-center gap-1.5 text-xs text-primary">
                   <input
                     type="radio"
                     name="exportFormat"
@@ -173,9 +173,9 @@ export default function ExportImportDialog({ open, onClose, selectedSearchId, on
           </div>
 
           <div className="mb-3">
-            <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Scope</label>
+            <label className="mb-1.5 block text-xs font-medium text-secondary">Scope</label>
             <div className="flex gap-3">
-              <label className="flex items-center gap-1.5 text-xs text-card-foreground">
+              <label className="flex items-center gap-1.5 text-xs text-primary">
                 <input
                   type="radio"
                   name="exportScope"
@@ -186,7 +186,7 @@ export default function ExportImportDialog({ open, onClose, selectedSearchId, on
                 />
                 All searches
               </label>
-              <label className="flex items-center gap-1.5 text-xs text-card-foreground">
+              <label className="flex items-center gap-1.5 text-xs text-primary">
                 <input
                   type="radio"
                   name="exportScope"
@@ -196,34 +196,34 @@ export default function ExportImportDialog({ open, onClose, selectedSearchId, on
                   disabled={!selectedSearchId}
                   className="accent-primary"
                 />
-                <span className={!selectedSearchId ? 'text-muted-foreground' : ''}>Current search</span>
+                <span className={!selectedSearchId ? 'text-secondary' : ''}>Current search</span>
               </label>
             </div>
           </div>
 
-          <p className="mb-3 text-[11px] text-muted-foreground">
+          <p className="mb-3 text-[11px] text-secondary">
             Non-seed data only (user-created searches and their price history)
           </p>
 
           {exportError && (
-            <p className="mb-2 text-xs text-destructive">{exportError}</p>
+            <p className="mb-2 text-xs text-danger">{exportError}</p>
           )}
 
           <button
             onClick={handleExport}
             disabled={exporting}
-            className="w-full rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+            className="w-full py-2 px-6 text-base bg-accent text-inverse hover:bg-accent-hover transition-colors disabled:opacity-50"
           >
             {exporting ? 'Downloading...' : 'Download Export'}
           </button>
         </div>
 
         {/* ── Separator ──────────────────────────────────── */}
-        <div className="mb-5 border-t border-border" />
+        <div className="mb-5 border-t border-weak" />
 
         {/* ── Import Section ─────────────────────────────── */}
-        <div className="rounded-lg border border-border bg-background p-4">
-          <h3 className="mb-3 text-sm font-medium text-card-foreground">Import</h3>
+        <div className="border border-weak bg-secondary p-4">
+          <h3 className="mb-3 text-sm font-medium text-primary">Import</h3>
 
           <div className="mb-3">
             <input
@@ -235,17 +235,17 @@ export default function ExportImportDialog({ open, onClose, selectedSearchId, on
             />
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="w-full rounded-lg border-2 border-dashed border-border px-3 py-4 text-xs text-muted-foreground transition-colors hover:border-primary hover:text-card-foreground"
+              className="w-full border-2 border-dashed border-weak px-3 py-4 text-xs text-secondary transition-colors hover:border-accent hover:text-primary"
             >
               {importFile ? importFile.name : 'Drop file here or click to browse'}
             </button>
-            <p className="mt-1 text-[11px] text-muted-foreground">Accepts: .csv, .json</p>
+            <p className="mt-1 text-[11px] text-secondary">Accepts: .csv, .json</p>
           </div>
 
           <div className="mb-3">
-            <label className="mb-1.5 block text-xs font-medium text-muted-foreground">On conflict</label>
+            <label className="mb-1.5 block text-xs font-medium text-secondary">On conflict</label>
             <div className="flex gap-3">
-              <label className="flex items-center gap-1.5 text-xs text-card-foreground">
+              <label className="flex items-center gap-1.5 text-xs text-primary">
                 <input
                   type="radio"
                   name="conflictStrategy"
@@ -256,7 +256,7 @@ export default function ExportImportDialog({ open, onClose, selectedSearchId, on
                 />
                 Skip existing
               </label>
-              <label className="flex items-center gap-1.5 text-xs text-card-foreground">
+              <label className="flex items-center gap-1.5 text-xs text-primary">
                 <input
                   type="radio"
                   name="conflictStrategy"
@@ -271,42 +271,42 @@ export default function ExportImportDialog({ open, onClose, selectedSearchId, on
           </div>
 
           {importError && (
-            <p className="mb-2 text-xs text-destructive">{importError}</p>
+            <p className="mb-2 text-xs text-danger">{importError}</p>
           )}
 
           <button
             onClick={handleImport}
             disabled={importing || !importFile}
-            className="w-full rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+            className="w-full py-2 px-6 text-base bg-accent text-inverse hover:bg-accent-hover transition-colors disabled:opacity-50"
           >
             {importing ? 'Importing...' : 'Upload & Import'}
           </button>
 
           {importReport && (
-            <div className="mt-3 rounded-lg border border-border bg-card p-3 text-xs text-card-foreground">
+            <div className="mt-3 border border-weak bg-secondary p-3 text-xs text-primary">
               <p className="mb-1 font-medium">Import Complete</p>
               <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
-                <span className="text-muted-foreground">Searches created:</span>
+                <span className="text-secondary">Searches created:</span>
                 <span>{importReport.searches.created}</span>
-                <span className="text-muted-foreground">Searches skipped:</span>
+                <span className="text-secondary">Searches skipped:</span>
                 <span>{importReport.searches.skipped}</span>
-                <span className="text-muted-foreground">Searches overwritten:</span>
+                <span className="text-secondary">Searches overwritten:</span>
                 <span>{importReport.searches.overwritten}</span>
-                <span className="text-muted-foreground">Snapshots created:</span>
+                <span className="text-secondary">Snapshots created:</span>
                 <span>{importReport.snapshots.created}</span>
-                <span className="text-muted-foreground">Snapshots skipped:</span>
+                <span className="text-secondary">Snapshots skipped:</span>
                 <span>{importReport.snapshots.skipped}</span>
-                <span className="text-muted-foreground">Snapshots overwritten:</span>
+                <span className="text-secondary">Snapshots overwritten:</span>
                 <span>{importReport.snapshots.overwritten}</span>
               </div>
               {(importReport.searches.errors.length > 0 || importReport.snapshots.errors.length > 0) && (
-                <div className="mt-2 border-t border-border pt-2">
-                  <p className="mb-1 font-medium text-destructive">Errors</p>
+                <div className="mt-2 border-t border-weak pt-2">
+                  <p className="mb-1 font-medium text-danger">Errors</p>
                   {importReport.searches.errors.map((e, i) => (
-                    <p key={`se-${i}`} className="text-destructive">Search {e.id}: {e.error}</p>
+                    <p key={`se-${i}`} className="text-danger">Search {e.id}: {e.error}</p>
                   ))}
                   {importReport.snapshots.errors.map((e, i) => (
-                    <p key={`sn-${i}`} className="text-destructive">Snapshot {e.id}: {e.error}</p>
+                    <p key={`sn-${i}`} className="text-danger">Snapshot {e.id}: {e.error}</p>
                   ))}
                 </div>
               )}

@@ -13,6 +13,7 @@ dist/
 **/jsconfig.json
 .vs-cache
 .c3nbrc.js
+flightPriceTrackerUi/react-template/
 
 # IDE
 .vscode/
@@ -26,3 +27,6 @@ Thumbs.db
 # Logs
 logs/
 *.log
+
+# PR evidence (ephemeral — committed temporarily for SHA-pinned URLs, then removed)
+.evidence/
