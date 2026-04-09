@@ -4,6 +4,9 @@ React frontend for the Flight Price Tracker. Deployed as an independent C3 AI
 package (`flightPriceTrackerUi`) that consumes the REST API from
 [flight-tracker-api](../flightTrackerApi).
 
+<img width="1459" height="910" alt="image" src="https://github.com/user-attachments/assets/b67e43d3-6b25-4d8e-a938-3a67bff06c62" />
+
+
 ## Architecture
 
 ```
